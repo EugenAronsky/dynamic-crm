@@ -7,10 +7,12 @@ type AnimatedNumberChangeProps<T extends ComponentType<any>> = {
   fixed?: number;
   startValue?: number;
   postfix?: string | undefined;
+  prefix?: string | undefined;
 } & Omit<ComponentProps<T>, 'children'>;
 
 export function AnimatedNumberChange<T extends ComponentType<any>>({
   value,
+  prefix,
   postfix,
   startValue,
   Component,
@@ -31,5 +33,9 @@ export function AnimatedNumberChange<T extends ComponentType<any>>({
     return controls.stop;
   }, [value, motionValue]);
 
-  return <Component {...(rest as any)}>{`${displayValue.toFixed(fixed)}${postfix}`}</Component>;
+  return (
+    <Component
+      {...(rest as any)}
+    >{`${prefix ?? ''}${displayValue.toFixed(fixed)}${postfix ?? ''}`}</Component>
+  );
 }

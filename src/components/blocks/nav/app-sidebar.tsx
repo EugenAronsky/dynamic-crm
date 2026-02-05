@@ -4,12 +4,14 @@ import {
   BadgeQuestionMark,
   Bell,
   BookMarked,
+  BookUser,
   Cable,
   CalendarRange,
   ChartArea,
   ChevronRight,
   ChevronsUpDown,
   ClipboardClock,
+  Contact,
   CreditCard,
   FolderClock,
   FolderKanban,
@@ -98,6 +100,12 @@ const sidebar_groups: SidebarGroupProps[] = [
         url: '/inbox',
         icon: Inbox,
         messages: 12,
+      },
+
+      {
+        title: 'Clients',
+        url: '/clients',
+        icon: BookUser,
       },
       {
         title: 'Documentation',
