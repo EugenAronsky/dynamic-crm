@@ -160,13 +160,18 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton asChild>
-                          <div>
-                            <item.icon />
-                            <span>{item.title}</span>
-                            {item.submenu?.length && (
+                          {item.submenu?.length ? (
+                            <div>
+                              <item.icon />
+                              <span>{item.title}</span>
                               <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=closed]/collapsible:rotate-0 group-data-[state=open]/collapsible:rotate-90" />
-                            )}
-                          </div>
+                            </div>
+                          ) : (
+                            <Link href={item.url}>
+                              <item.icon />
+                              <span>{item.title}</span>
+                            </Link>
+                          )}
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       {item.messages && (
