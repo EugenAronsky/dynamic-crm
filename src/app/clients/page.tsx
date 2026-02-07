@@ -72,7 +72,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 
 type StatusColors = 'blue' | 'amber' | 'emerald' | 'fuchsia' | 'red';
 type ClientStatus = 'regular' | 'new' | 'demanding' | 'VIP';
@@ -83,7 +83,7 @@ const StatusColorsObject: Record<RadioCategories, StatusColors> = {
   VIP: 'fuchsia',
   new: 'emerald',
   demanding: 'red',
-  regular: 'blue',
+  regular: 'amber',
 };
 
 const radio_categories: { value: RadioCategories; icon: LucideIcon; color: StatusColors }[] = [
@@ -473,14 +473,43 @@ function ClientCard({
   );
 }
 
+const normalize = (s: string) => s.replace(/\s+/g, '').toLowerCase();
+
+function SearchInput({ onChange }: { onChange?: (str: string) => void }) {
+  const [search, setSearch] = useState<string>('');
+  const deferredSearch = useDeferredValue(search);
+
+  useEffect(() => {
+    const id = setTimeout(() => onChange && onChange(normalize(deferredSearch).trim()), 200);
+    return () => clearTimeout(id);
+  }, [deferredSearch]);
+
+  return (
+    <Label className="relative">
+      <Search size={20} className="text-muted-foreground absolute left-2" />
+      <Input
+        value={search}
+        className="w-68 pl-9"
+        placeholder="Search by name or number..."
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </Label>
+  );
+}
+
 export default function Clients() {
+  const [search, setSearch] = useState<string>('');
   const [status, setStatus] = useState<RadioCategories>('all');
 
-  const filterdList = useMemo(
-    () =>
-      status !== 'all' ? clientsList.filter((client) => client.status === status) : clientsList,
-    [status]
-  );
+  const filterdList = useMemo(() => {
+    const list =
+      status !== 'all' ? clientsList.filter((client) => client.status === status) : clientsList;
+
+    return list.filter(
+      ({ name, phone }) =>
+        normalize(name).trim().includes(search) || normalize(phone).trim().includes(search)
+    );
+  }, [status, search]);
 
   return (
     <section className="flex flex-1 flex-col">
@@ -489,15 +518,17 @@ export default function Clients() {
           <ItemHeader className="w-fit basis-auto items-end gap-1.25 pl-1.5">
             <div className="flex items-center gap-2 font-semibold">
               <Users size={16} />
-              <span>Client base</span>
+              <span>
+                <span className="capitalize">{status}</span> clients
+              </span>
             </div>
             <span className="-translate-y-1 text-xs">
               (
               <AnimatedNumberChange
                 fixed={0}
                 postfix=""
-                value={12}
                 startValue={0}
+                value={filterdList.length}
                 Component={TypographyExtraSmall}
               />
               )
@@ -505,10 +536,7 @@ export default function Clients() {
           </ItemHeader>
           <ItemFooter className="basis-auto flex-col gap-2">
             <div className="flex gap-2">
-              <Label className="relative">
-                <Search size={20} className="text-muted-foreground absolute left-2" />
-                <Input className="w-68 pl-9" placeholder="Search by name or number..." />
-              </Label>
+              <SearchInput onChange={(value) => setSearch(value)} />
               <Button className="cursor-pointer bg-blue-500! hover:brightness-95">
                 <span>Add new</span>
                 <Plus />

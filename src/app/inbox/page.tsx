@@ -452,6 +452,7 @@ export default function Inbox() {
               variant={'outline'}
               disabled={!Boolean(status || type)}
               onClick={() => {
+                setSorted(false);
                 setType(undefined);
                 setStatus(undefined);
               }}
