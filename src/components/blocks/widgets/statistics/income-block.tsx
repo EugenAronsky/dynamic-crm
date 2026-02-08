@@ -14,15 +14,15 @@ function IncomeBlock({ prev, title, value }: Props) {
   const difference = value - prev;
 
   return (
-    <Item className="flex h-full py-0">
+    <Item className="flex h-full py-3">
       <ItemContent className="flex h-full flex-col items-start justify-center gap-1.5">
         <span className="text-muted-foreground font-semibold">{title}</span>
         <span className={cn('**:text-xl', difference > 0 ? 'text-green-700' : 'text-red-600')}>
           <AnimatedNumberChange
             prefix="$"
             value={value}
+            startValue={prev}
             Component={TypographySmall}
-            startValue={0}
           />
         </span>
         <span
@@ -34,7 +34,6 @@ function IncomeBlock({ prev, title, value }: Props) {
           {difference > 0 ? '↑ +' : '↓ '}
           <AnimatedNumberChange
             postfix="%"
-            fixed={2}
             value={(difference * 100) / prev}
             Component={TypographyExtraSmall}
             startValue={0}

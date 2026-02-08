@@ -10,7 +10,7 @@ interface Props {
   prev: number;
 }
 
-function BookingsBlock({ prev, title, value }: Props) {
+function CancelationBlock({ prev, title, value }: Props) {
   const difference = value - prev;
 
   return (
@@ -23,7 +23,7 @@ function BookingsBlock({ prev, title, value }: Props) {
         <span
           className={cn(
             'align-super text-[10px]',
-            difference > 0 ? 'text-blue-600' : 'text-red-600'
+            difference > 0 ? 'text-red-600' : 'text-red-600'
           )}
         >
           <AnimatedNumberChange
@@ -31,11 +31,11 @@ function BookingsBlock({ prev, title, value }: Props) {
             Component={TypographyExtraSmall}
             startValue={0}
           />{' '}
-          new booking
+          new cancellation
         </span>
       </ItemContent>
     </Item>
   );
 }
 
-export default BookingsBlock;
+export default CancelationBlock;

@@ -5,43 +5,28 @@ import { TrendingUpDown } from 'lucide-react';
 import { ComponentProps, useState } from 'react';
 import IncomeBlock from './income-block';
 import BookingsBlock from './bookings-block';
-import CancelationBlock from './cancelation-bloack';
+import CancelationBlock from './cancelation-block';
+import ConversionBlock from './сonversion-block';
+import ExpectedBlock from './expected-block';
 
 type Props = ComponentProps<typeof Item> & { isResizing: boolean };
-type TabsValue = 'month' | 'week' | 'day';
-
-const stats = [
-  {
-    name: `Income (${format(new Date(), 'MMMM')})`,
-    value: 18.2,
-    prev: 9.45,
-    tip: 'Profit and Loss',
-  },
-  {
-    name: 'Bookings today',
-    prev: 13,
-    value: 8,
-    tip: 'Cancellation Index',
-  },
-  {
-    name: 'WI',
-    prev: 17.25,
-    value: 12.15,
-    tip: 'Workload Index',
-  },
-];
 
 function Statistics({ isResizing, ...rest }: Props) {
   return (
     <Item
       {...rest}
-      className={cn('h-full min-w-fit flex-col items-start justify-center p-0', rest.className)}
+      className={cn(
+        'h-full min-h-fit min-w-fit flex-col items-start justify-center p-0',
+        rest.className
+      )}
     >
       <ItemContent className="flex h-full min-h-fit w-full basis-0 flex-row items-center justify-between">
-        <div className="flex h-full gap-2 *:shadow-[0_0_4px_0] *:shadow-black/15">
-          <IncomeBlock prev={1800} value={4050} title={`Income (${format(new Date(), 'MMMM')})`} />
-          <BookingsBlock prev={8} value={10} title="Bookings today" />
-          <CancelationBlock prev={1} value={2} title="Cancelation today" />
+        <div className="grid h-full w-full grid-cols-5 gap-2 *:grow *:shadow-[0_0_4px_0] *:shadow-black/15">
+          <IncomeBlock prev={1800} value={4050} title={`Income`} />
+          <ExpectedBlock prev={800} value={1020} title={`Expected`} />
+          <BookingsBlock prev={8} value={10} title="Bookings" />
+          <CancelationBlock prev={1} value={2} title="Cancelations" />
+          <ConversionBlock title={`Conversion `} bookings={17} leads={42} />
         </div>
       </ItemContent>
     </Item>

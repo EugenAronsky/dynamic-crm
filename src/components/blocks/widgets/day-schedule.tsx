@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Item, ItemContent, ItemDescription, ItemFooter, ItemHeader } from '@/components/ui/item';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { BookUser, Headset } from 'lucide-react';
+import { BookUser, Contact, Headset } from 'lucide-react';
 import { ComponentProps, useLayoutEffect, useRef, useState } from 'react';
 import { mmToHHMM } from './timeline/timeline-halpers';
 import { Separator } from '@/components/ui/separator';
@@ -86,21 +86,33 @@ function DaySchedule({ isResizing, ...rest }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [maxH, setMaxH] = useState(0);
 
-  useLayoutEffect(() => setMaxH(ref.current?.clientHeight ?? 0), [ref]);
+  useLayoutEffect(() => {
+    setMaxH(ref.current?.clientHeight ?? 0);
+    const controller = new AbortController();
+    window.addEventListener('resize', () => setMaxH(ref.current?.clientHeight ?? 0), {
+      signal: controller.signal,
+    });
+
+    return () => controller.abort();
+  }, [ref]);
 
   return (
     <Item
       {...rest}
       className={cn(
-        'flex min-h-0 min-w-92.5 flex-col shadow-[0_0_4px_0] shadow-black/15',
+        'flex h-full min-h-0 min-w-92.5 flex-col shadow-[0_0_4px_0] shadow-black/15',
         isResizing && 'blur-xs grayscale-100',
         rest.className
       )}
     >
-      <ItemHeader className="w-full shrink-0 basis-0">Day Schedule - Your day meetings</ItemHeader>
+      <ItemHeader className="w-full shrink-0 basis-0">
+        <div className="flex items-center gap-2">
+          <Contact size={18} /> <span>Day Schedule - Your day meetings</span>
+        </div>
+      </ItemHeader>
       <ItemContent
         ref={ref}
-        className="size-full min-h-0 flex-1 overflow-hidden rounded-sm py-1 pr-1 pl-3 shadow-[inset_0_0_5px_1px] shadow-black/15"
+        className="size-full min-h-0 flex-1 overflow-hidden rounded-sm py-1 pr-0 pl-3 shadow-[inset_0_0_5px_1px] shadow-black/10"
       >
         <ScrollArea style={{ height: `${maxH - 8}px` }} className="relative w-full py-2 pr-3">
           <div className="flex max-w-full min-w-0 flex-col gap-2 overflow-hidden pb-px">

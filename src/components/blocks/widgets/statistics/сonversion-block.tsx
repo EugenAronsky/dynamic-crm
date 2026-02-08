@@ -6,36 +6,39 @@ import { TypographySmall } from '../../typography/typography-small';
 
 interface Props {
   title: string;
-  value: number;
-  prev: number;
+  bookings: number;
+  leads: number;
 }
 
-function BookingsBlock({ prev, title, value }: Props) {
-  const difference = value - prev;
+function ConversionBlock({ bookings, title, leads }: Props) {
+  // const difference = value - prev;
 
   return (
     <Item className="flex h-full py-3">
       <ItemContent className="flex h-full flex-col items-start justify-center gap-1.5">
         <span className="text-muted-foreground font-semibold">{title}</span>
         <span className="**:text-xl">
-          <AnimatedNumberChange value={value} Component={TypographySmall} startValue={0} />
-        </span>
-        <span
-          className={cn(
-            'align-super text-[10px]',
-            difference > 0 ? 'text-blue-600' : 'text-red-600'
-          )}
-        >
           <AnimatedNumberChange
-            value={difference}
+            postfix="%"
+            value={(bookings * 100) / leads}
+            startValue={0}
+            Component={TypographySmall}
+          />
+        </span>
+        <span className={cn('text-muted-foreground align-super text-[10px]')}>
+          (
+          <AnimatedNumberChange
+            value={leads}
             Component={TypographyExtraSmall}
             startValue={0}
           />{' '}
-          new booking
+          leads →{' '}
+          <AnimatedNumberChange value={bookings} Component={TypographyExtraSmall} startValue={0} />{' '}
+          bookings)
         </span>
       </ItemContent>
     </Item>
   );
 }
 
-export default BookingsBlock;
+export default ConversionBlock;

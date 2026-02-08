@@ -10,32 +10,39 @@ interface Props {
   prev: number;
 }
 
-function CancelationBlock({ prev, title, value }: Props) {
+function ExpectedBlock({ prev, title, value }: Props) {
   const difference = value - prev;
 
   return (
-    <Item className="flex h-full py-0">
+    <Item className="flex h-full py-3">
       <ItemContent className="flex h-full flex-col items-start justify-center gap-1.5">
         <span className="text-muted-foreground font-semibold">{title}</span>
-        <span className="**:text-xl">
-          <AnimatedNumberChange value={value} Component={TypographySmall} startValue={0} />
+        <span className={cn('**:text-xl', difference > 0 ? 'text-amber-500' : 'text-red-600')}>
+          <AnimatedNumberChange
+            prefix="$"
+            value={value}
+            startValue={prev}
+            Component={TypographySmall}
+          />
         </span>
         <span
           className={cn(
-            'align-super text-[10px]',
-            difference > 0 ? 'text-red-600' : 'text-red-600'
+            'align-super text-[10px] opacity-50',
+            difference > 0 ? 'text-amber-500' : 'text-red-600'
           )}
         >
+          {difference > 0 ? '↑ +' : '↓ '}
           <AnimatedNumberChange
-            value={difference}
-            Component={TypographyExtraSmall}
+            postfix="%"
             startValue={0}
+            value={(difference * 100) / prev}
+            Component={TypographyExtraSmall}
           />{' '}
-          new cancellation
+          vs last week
         </span>
       </ItemContent>
     </Item>
   );
 }
 
-export default CancelationBlock;
+export default ExpectedBlock;
