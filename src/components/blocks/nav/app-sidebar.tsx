@@ -15,6 +15,7 @@ import {
   CreditCard,
   FolderClock,
   FolderKanban,
+  HandPlatter,
   HatGlasses,
   Inbox,
   LogOut,
@@ -101,11 +102,15 @@ const sidebar_groups: SidebarGroupProps[] = [
         icon: Inbox,
         messages: 12,
       },
-
       {
         title: 'Clients',
         url: '/clients',
         icon: BookUser,
+      },
+      {
+        title: 'My Services',
+        url: '/my-services',
+        icon: HandPlatter,
       },
       {
         title: 'Documentation',
