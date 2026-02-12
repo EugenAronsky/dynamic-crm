@@ -174,7 +174,7 @@ export function AppSidebar() {
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton asChild>
                           {item.submenu?.length ? (
-                            <div>
+                            <div className="cursor-pointer">
                               <item.icon />
                               <span>{item.title}</span>
                               <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=closed]/collapsible:rotate-0 group-data-[state=open]/collapsible:rotate-90" />

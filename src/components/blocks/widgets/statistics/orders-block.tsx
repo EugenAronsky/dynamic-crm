@@ -1,3 +1,4 @@
+'use client';
 import { Item, ItemContent } from '@/components/ui/item';
 import { cn } from '@/lib/utils';
 import { AnimatedNumberChange } from '../../motion/animated-number-change';
@@ -10,7 +11,7 @@ interface Props {
   prev: number;
 }
 
-function BookingsBlock({ prev, title, value }: Props) {
+function OrdersBlock({ prev, title, value }: Props) {
   const difference = value - prev;
 
   return (
@@ -38,4 +39,4 @@ function BookingsBlock({ prev, title, value }: Props) {
   );
 }
 
-export default BookingsBlock;
+export default OrdersBlock;

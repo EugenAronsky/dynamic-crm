@@ -1,17 +1,47 @@
 import { Item, ItemContent } from '@/components/ui/item';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { TrendingUpDown } from 'lucide-react';
-import { ComponentProps, useState } from 'react';
-import IncomeBlock from './income-block';
-import BookingsBlock from './bookings-block';
+import React, { ComponentProps } from 'react';
+import AverageProfitBlock from './average-profit-block';
+import OrdersBlock from './orders-block';
 import CancelationBlock from './cancelation-block';
-import ConversionBlock from './сonversion-block';
 import ExpectedBlock from './expected-block';
+import IncomeBlock from './income-block';
+import TopServiceBlock from './top-service-block';
+import UnpopularServicBlock from './unpopular-service-block';
+import ConversionBlock from './сonversion-block';
+import UtilizationBlock from './utilization-block';
 
-type Props = ComponentProps<typeof Item> & { isResizing: boolean };
+const BLOCKS_LIST = {
+  Income: IncomeBlock,
+  Orders: OrdersBlock,
+  Cancelation: CancelationBlock,
+  Conversion: ConversionBlock,
+  Expected: ExpectedBlock,
+  TopServiceBlock: TopServiceBlock,
+  AverageProfitBlock: AverageProfitBlock,
+  UnpopularServicBlock: UnpopularServicBlock,
+  UtilizationBlock: UtilizationBlock,
+} as const;
 
-function Statistics({ isResizing, ...rest }: Props) {
+type StatisticsBlocks = keyof typeof BLOCKS_LIST;
+
+type BlockPropsMap = {
+  [K in StatisticsBlocks]: React.ComponentProps<(typeof BLOCKS_LIST)[K]>;
+};
+
+type AnyBlockConfig = {
+  [K in StatisticsBlocks]: {
+    type: K;
+    props: BlockPropsMap[K];
+  };
+}[StatisticsBlocks];
+
+type Props = ComponentProps<typeof Item> & {
+  blocks: AnyBlockConfig[];
+  isResizing: boolean;
+};
+
+function Statistics({ blocks, isResizing, ...rest }: Props) {
   return (
     <Item
       {...rest}
@@ -21,12 +51,14 @@ function Statistics({ isResizing, ...rest }: Props) {
       )}
     >
       <ItemContent className="flex h-full min-h-fit w-full basis-0 flex-row items-center justify-between">
-        <div className="grid h-full w-full grid-cols-5 gap-2 *:grow *:shadow-[0_0_4px_0] *:shadow-black/15">
-          <IncomeBlock prev={1800} value={4050} title={`Income`} />
-          <ExpectedBlock prev={800} value={1020} title={`Expected`} />
-          <BookingsBlock prev={8} value={10} title="Bookings" />
-          <CancelationBlock prev={1} value={2} title="Cancelations" />
-          <ConversionBlock title={`Conversion `} bookings={17} leads={42} />
+        <div
+          style={{ gridTemplateColumns: `repeat(${blocks.length}, minmax(0, 1fr))` }}
+          className="grid h-full w-full gap-2 *:grow *:shadow-[0_0_4px_0] *:shadow-black/15"
+        >
+          {blocks.map((block) => {
+            const Component = BLOCKS_LIST[block.type] as React.ComponentType<typeof block.props>;
+            return <Component key={block.type} {...block.props} />;
+          })}
         </div>
       </ItemContent>
     </Item>

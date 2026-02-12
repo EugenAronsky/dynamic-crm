@@ -2,6 +2,14 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Select,
   SelectContent,
@@ -12,7 +20,17 @@ import {
 import { cn } from '@/lib/utils';
 import { SelectValue } from '@radix-ui/react-select';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Ellipsis, Settings } from 'lucide-react';
+import {
+  ArrowDownWideNarrow,
+  ArrowUpDown,
+  ArrowUpNarrowWide,
+  ArrowUpWideNarrow,
+  ChevronsUpDown,
+  Ellipsis,
+  PenBox,
+  Settings,
+  Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 
 // This type is used to define the shape of our data.
@@ -79,6 +97,30 @@ export type Service = {
 
 export const columns: ColumnDef<Service>[] = [
   {
+    size: 20,
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        className="cursor-pointer"
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        className="cursor-pointer"
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: 'service',
     header: 'Service',
     cell: ({ getValue }) => {
@@ -89,13 +131,13 @@ export const columns: ColumnDef<Service>[] = [
     size: 100,
 
     header: ({ column }) => {
-      const [value, setValue] = useState<ServiceCategory | undefined>();
+      const value = column.getFilterValue() as ServiceCategory | undefined;
 
       return (
         <Select value={value} key={`status-select-${value}`}>
           <SelectTrigger
             className={cn(
-              'max-h-7 w-full min-w-17.5 cursor-pointer justify-center rounded-sm border-none bg-white px-2 py-0 shadow-xs shadow-black/20 [&>svg]:hidden',
+              'max-h-7 w-full min-w-17.5 cursor-pointer justify-center rounded-sm border-none bg-white px-2 py-0 shadow-[0_0_4px_0_inset] shadow-black/15 [&>svg]:hidden',
               value ? (SERVICE_CATEGORY_META[value]?.color ?? '') : 'text-black!',
               'transition-all hover:brightness-95'
             )}
@@ -108,10 +150,10 @@ export const columns: ColumnDef<Service>[] = [
                 <SelectItem
                   value={categorie}
                   key={`status-${categorie}`}
-                  onPointerDown={() => {
-                    column.setFilterValue(value === categorie ? undefined : categorie);
-                    setValue((curr) => (curr === categorie ? undefined : categorie));
-                  }}
+                  className="cursor-pointer"
+                  onPointerDown={() =>
+                    column.setFilterValue(value === categorie ? undefined : categorie)
+                  }
                 >
                   {SERVICE_CATEGORY_META[categorie]?.icon} {categorie}
                 </SelectItem>
@@ -133,17 +175,31 @@ export const columns: ColumnDef<Service>[] = [
   },
   {
     size: 60,
-    header: ({ column }) => (
-      <Button
-        size={'sm'}
-        variant={'ghost'}
-        className="cursor-pointer"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        💵 Price
-        <ArrowUpDown />
-      </Button>
-    ),
+    header: ({ column }) => {
+      const sorted = column.getIsSorted();
+      return (
+        <Button
+          size={'sm'}
+          variant={'ghost'}
+          className="cursor-pointer"
+          onClick={() => {
+            if (sorted === 'asc') column.clearSorting();
+            else column.toggleSorting(!Boolean(column.getIsSorted() === 'desc'));
+          }}
+        >
+          <span>Price</span>
+          {sorted ? (
+            sorted === 'asc' ? (
+              <ArrowUpNarrowWide />
+            ) : (
+              <ArrowDownWideNarrow />
+            )
+          ) : (
+            <ChevronsUpDown />
+          )}
+        </Button>
+      );
+    },
     accessorKey: 'price',
     cell: ({ getValue }) => {
       const amount = parseFloat(getValue<string>());
@@ -168,13 +224,13 @@ export const columns: ColumnDef<Service>[] = [
   {
     size: 45,
     header: ({ column }) => {
-      const [value, setValue] = useState<string | undefined>();
+      const value = column.getFilterValue() as ServiceStatus | undefined;
 
       return (
         <Select value={value} key={`status-select-${value}`}>
           <SelectTrigger
             className={cn(
-              'max-h-7 w-full min-w-17.5 cursor-pointer justify-center rounded-full border-none bg-white px-2 py-0 text-black! shadow-xs shadow-black/20 [&>svg]:hidden',
+              'max-h-7 w-full min-w-17.5 cursor-pointer justify-center rounded-full border-none bg-white px-2 py-0 text-black! shadow-[0_0_4px_0_inset] shadow-black/15 [&>svg]:hidden',
               value === 'Active' && 'bg-emerald-100 text-emerald-500!',
               value === 'Draft' && 'bg-amber-100 text-amber-500!',
               value === 'Hidden' && 'bg-slate-100 text-slate-500!',
@@ -189,10 +245,8 @@ export const columns: ColumnDef<Service>[] = [
                 <SelectItem
                   value={status}
                   key={`status-${status}`}
-                  onPointerDown={() => {
-                    column.setFilterValue(value === status ? undefined : status);
-                    setValue((curr) => (curr === status ? undefined : status));
-                  }}
+                  className="cursor-pointer"
+                  onPointerDown={() => column.setFilterValue(value === status ? undefined : status)}
                 >
                   {status}
                 </SelectItem>
@@ -224,9 +278,24 @@ export const columns: ColumnDef<Service>[] = [
     accessorKey: 'actions',
     cell: ({ column }) => {
       return (
-        <Button size={'icon-sm'} variant={'secondary'}>
-          <Ellipsis />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size={'icon-sm'} className="cursor-pointer" variant={'secondary'}>
+              <Ellipsis />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end">
+            <DropdownMenuGroup className="*:cursor-pointer">
+              <DropdownMenuItem>
+                <PenBox /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive">
+                <Trash2 /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       );
     },
   },

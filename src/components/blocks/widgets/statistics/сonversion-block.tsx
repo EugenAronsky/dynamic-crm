@@ -1,3 +1,4 @@
+'use client';
 import { Item, ItemContent } from '@/components/ui/item';
 import { cn } from '@/lib/utils';
 import { AnimatedNumberChange } from '../../motion/animated-number-change';
@@ -11,8 +12,6 @@ interface Props {
 }
 
 function ConversionBlock({ bookings, title, leads }: Props) {
-  // const difference = value - prev;
-
   return (
     <Item className="flex h-full py-3">
       <ItemContent className="flex h-full flex-col items-start justify-center gap-1.5">

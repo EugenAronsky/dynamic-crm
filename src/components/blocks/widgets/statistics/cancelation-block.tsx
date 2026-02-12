@@ -1,3 +1,4 @@
+'use client';
 import { Item, ItemContent } from '@/components/ui/item';
 import { cn } from '@/lib/utils';
 import { AnimatedNumberChange } from '../../motion/animated-number-change';
@@ -20,12 +21,7 @@ function CancelationBlock({ prev, title, value }: Props) {
         <span className="**:text-xl">
           <AnimatedNumberChange value={value} Component={TypographySmall} startValue={0} />
         </span>
-        <span
-          className={cn(
-            'align-super text-[10px]',
-            difference > 0 ? 'text-red-600' : 'text-red-600'
-          )}
-        >
+        <span className={cn('align-super text-[10px] text-red-600')}>
           <AnimatedNumberChange
             value={difference}
             Component={TypographyExtraSmall}

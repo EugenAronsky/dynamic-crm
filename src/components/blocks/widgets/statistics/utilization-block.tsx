@@ -7,12 +7,12 @@ import { TypographySmall } from '../../typography/typography-small';
 
 interface Props {
   title: string;
-  value: number;
-  prev: number;
+  prev: { hours: number; total_hours: number };
+  value: { hours: number; total_hours: number };
 }
 
-function ExpectedBlock({ prev, title, value }: Props) {
-  const difference = value - prev;
+function UtilizationBlock({ prev, title, value }: Props) {
+  const difference = value.hours / value.total_hours - prev.hours / prev.total_hours;
 
   return (
     <Item className="flex h-full py-3">
@@ -21,34 +21,34 @@ function ExpectedBlock({ prev, title, value }: Props) {
         <span
           className={cn(
             '**:text-xl',
-            difference === 0 ? 'text-gray-600' : difference > 0 ? 'text-amber-500' : 'text-red-600'
+            difference === 0 ? 'text-gray-600' : difference > 0 ? 'text-green-700' : 'text-red-600'
           )}
         >
           <AnimatedNumberChange
-            prefix="$"
-            value={value}
-            startValue={prev}
+            postfix="%"
+            startValue={0}
             Component={TypographySmall}
+            value={(value.hours / value.total_hours) * 100}
           />
         </span>
         <span
           className={cn(
             'align-super text-[10px] opacity-50',
-            difference === 0 ? 'text-gray-600' : difference > 0 ? 'text-amber-500' : 'text-red-600'
+            difference === 0 ? 'text-gray-600' : difference > 0 ? 'text-green-700' : 'text-red-600'
           )}
         >
           {difference !== 0 && difference > 0 ? '↑ +' : '↓ '}
           <AnimatedNumberChange
             postfix="%"
-            startValue={0}
-            value={(difference * 100) / prev}
+            value={difference * 100}
             Component={TypographyExtraSmall}
+            startValue={0}
           />{' '}
-          vs last week
+          since last month
         </span>
       </ItemContent>
     </Item>
   );
 }
 
-export default ExpectedBlock;
+export default UtilizationBlock;

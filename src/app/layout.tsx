@@ -8,6 +8,7 @@ import AppBread from '@/components/blocks/nav/app-bread';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Globe2 } from 'lucide-react';
+import LanguagePicker from '@/components/blocks/nav/language-picker';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,7 +43,7 @@ export default function RootLayout({
         <SidebarProvider>
           <AppSidebar />
           <main className="flex max-h-screen flex-1 flex-col">
-            <div className="bg-sidebar border-sidebar-border flex max-h-12 w-full items-center justify-between border-b p-2">
+            <div className="bg-sidebar border-sidebar-border flex h-full max-h-[48.4px] w-full items-center justify-between border-b p-2">
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="size-8 cursor-pointer" />
                 <Separator orientation="vertical" className="mr-2 h-4!" />
@@ -50,12 +51,7 @@ export default function RootLayout({
               </div>
 
               <div className="flex items-center gap-2 *:cursor-pointer">
-                {/* <Button size={'sm'} className="">
-                  Lang
-                </Button> */}
-                <Button size={'icon-sm'} variant={'outline'} className="">
-                  <Globe2 />
-                </Button>
+                <LanguagePicker />
               </div>
             </div>
             <section className="relative flex flex-1 overflow-hidden shadow-[inset_0_0_10px_0] shadow-black/10">
