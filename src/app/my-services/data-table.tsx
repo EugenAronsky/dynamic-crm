@@ -12,6 +12,15 @@ import {
   VisibilityState,
 } from '@tanstack/react-table';
 
+import { useWidgetStorage } from '@/components/blocks/widgets/widget-storage';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -20,30 +29,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
 import {
   ArrowBigDownDash,
   ArrowBigUpDash,
   CheckCheck,
-  CheckCheckIcon,
   EyeOff,
   ListRestart,
-  MousePointerClick,
   Plus,
   SquareDashedMousePointer,
   Trash2,
 } from 'lucide-react';
-import { useMotionValue } from 'motion/react';
+import { useCallback, useState } from 'react';
+import { is } from 'date-fns/locale';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,19 +49,6 @@ interface DataTableProps<TData, TValue> {
 }
 
 export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [maxH, setMaxH] = useState(0);
-
-  useLayoutEffect(() => {
-    setMaxH(ref.current?.clientHeight ?? 0);
-    const controller = new AbortController();
-    window.addEventListener('resize', () => setMaxH(ref.current?.clientHeight ?? 0), {
-      signal: controller.signal,
-    });
-
-    return () => controller.abort();
-  }, [ref]);
-
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -97,7 +82,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   const isSelected = Object.keys(rowSelection).length > 0;
 
   return (
-    <div ref={ref} className="relative flex h-full w-full flex-col gap-2 overflow-hidden p-2">
+    <div className="relative flex h-full w-full flex-col gap-2 overflow-hidden p-2">
       <div className="flex justify-between gap-2 *:shadow-[0_0_4px_0] *:shadow-black/15">
         <Button className="cursor-pointer bg-blue-500! hover:brightness-95">
           <span>Add new</span>
@@ -177,11 +162,12 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             ))}
           </TableHeader>
           <TableBody
-            style={{
-              maxHeight: `${maxH - (isSelected ? 151 : 101)}px`,
-              minHeight: `${maxH - (isSelected ? 151 : 101)}px`,
-            }}
-            className="custom-scrollbar flex w-full min-w-full flex-col overflow-y-scroll transition-all"
+            className={cn(
+              'max-h-[calc(var(--widget-content-height)-100px)] min-h-[calc(var(--widget-content-height)-100px)]',
+              'custom-scrollbar flex w-full min-w-full flex-col overflow-y-scroll transition-all',
+              isSelected &&
+                'max-h-[calc(var(--widget-content-height)-151px)] min-h-[calc(var(--widget-content-height)-151px)]'
+            )}
           >
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (

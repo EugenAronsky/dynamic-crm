@@ -1,10 +1,8 @@
 'use client';
 import { AnimatedNumberChange } from '@/components/blocks/motion/animated-number-change';
 import { TypographyExtraSmall } from '@/components/blocks/typography/typography-extra-small';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Widget from '@/components/blocks/widgets/widget';
 import { Button } from '@/components/ui/button';
-import { Item, ItemDescription, ItemFooter, ItemHeader } from '@/components/ui/item';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -14,17 +12,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
 import {
   AtSign,
   BellDot,
   BellRing,
   CalendarCheck,
   CalendarX,
-  Circle,
   Hammer,
-  HatGlasses,
   LucideIcon,
   Mail,
   MailOpen,
@@ -36,54 +30,9 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import InboxScrollArea from './inbox-scroll-area';
 
-function MessagesCard({ status, description, title, type, createdAt }: Message) {
-  const { icon: Icon, color } = messageTypeMeta[type];
-  return (
-    <Item
-      className={cn(
-        'relative flex cursor-pointer flex-row flex-nowrap items-start justify-between overflow-hidden border-none bg-white shadow-[0_0_4px_0] shadow-black/15 transition-all *:basis-auto hover:brightness-97',
-        status === 'seen' && 'opacity-50 hover:brightness-95'
-      )}
-    >
-      <div
-        className={cn(
-          'absolute -top-0.5 left-0 h-6 w-2 -skew-x-45 bg-transparent',
-          status === 'new' && 'bg-red-400'
-        )}
-      />
-      <ItemHeader className="flex flex-col items-start gap-2">
-        <div className="flex items-center gap-2">
-          <Avatar className="size-9">
-            <AvatarImage
-              className="object-cover"
-              src={
-                'https://m.media-amazon.com/images/M/MV5BMDEzMmQwZjctZWU2My00MWNlLWE0NjItMDJlYTRlNGJiZjcyXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg'
-              }
-            />
-            <AvatarFallback>SS</AvatarFallback>
-          </Avatar>
-          <span className="text-base font-semibold">Steven Spielberg</span>
-        </div>
-        <span>{title}</span>
-        <ItemDescription className="flex flex-row items-center gap-2 text-xs">
-          <Circle size={4} className="fill-muted-foreground stroke-muted-foreground" />
-          {description}
-        </ItemDescription>
-      </ItemHeader>
-      <ItemFooter className="h-full flex-col items-end justify-between text-xs">
-        <div className={cn('flex items-end gap-2 capitalize', color && color)}>
-          {type}
-          <Icon className="stroke-[1.25]" size={18} />
-        </div>
-
-        <span className="">{format(createdAt, 'dd/MM/yyyy')}</span>
-      </ItemFooter>
-    </Item>
-  );
-}
-
-type Message = {
+export type Message = {
   id: string;
   title: string;
   description: string;
@@ -106,7 +55,7 @@ type Message = {
 
 type MessagePriority = 'low' | 'normal' | 'high' | 'urgent';
 
-const MessageTypeArray = [
+export const MessageTypeArray = [
   'reservation',
   'cancellation',
   'renovation',
@@ -127,7 +76,7 @@ const messageStatusIcons: Record<MessageStatus, LucideIcon> = {
   unread: Mail,
 } as const;
 
-const messageTypeMeta: Record<MessageType, { icon: LucideIcon; color: string }> = {
+export const messageTypeMeta: Record<MessageType, { icon: LucideIcon; color: string }> = {
   reservation: {
     icon: CalendarCheck,
     color: 'text-emerald-600',
@@ -372,27 +321,29 @@ export default function Inbox() {
   return (
     <section className="flex flex-1 flex-col">
       <div className="w-full p-2">
-        <Item className="flex w-full flex-row flex-nowrap justify-between bg-white p-2 shadow-[0_0_4px_0] shadow-black/15">
-          <ItemHeader className="w-fit basis-auto items-end gap-1.25 pl-1.5">
-            <div className="flex items-center gap-2 font-semibold">
-              <AtSign size={16} />
-              <span className="capitalize">{status ?? 'All'}</span>
-              {type && <span className="capitalize">{type}</span>}
-              <span>messages</span>
-            </div>
-            <span className="-translate-y-1 text-xs">
-              (
-              <AnimatedNumberChange
-                value={filteredList.length}
-                startValue={0}
-                fixed={0}
-                postfix=""
-                Component={TypographyExtraSmall}
-              />
-              )
-            </span>
-          </ItemHeader>
-          <ItemFooter className="basis-auto">
+        <Widget className="flex h-fit min-h-fit w-full flex-row flex-nowrap items-center justify-between p-2">
+          <Widget.Header className="w-fit basis-auto items-end gap-1.25 pl-1.5">
+            <Widget.Title className="gap-1">
+              <div className="flex gap-2 font-semibold">
+                <AtSign size={16} className="mt-0.75" />
+                <span className="capitalize">{status ?? 'All'}</span>
+                {type && <span className="capitalize">{type}</span>}
+                <span>messages</span>
+              </div>
+              <span className="-translate-y-1 text-xs">
+                (
+                <AnimatedNumberChange
+                  value={filteredList.length}
+                  startValue={0}
+                  fixed={0}
+                  postfix=""
+                  Component={TypographyExtraSmall}
+                />
+                )
+              </span>
+            </Widget.Title>
+          </Widget.Header>
+          <Widget.Footer className="*:cursor-pointer">
             <Button onClick={() => setSorted((cur) => !cur)} variant={'outline'} size={'icon'}>
               {sorted ? <SortAsc /> : <SortDesc />}
             </Button>
@@ -459,28 +410,19 @@ export default function Inbox() {
             >
               <RotateCcw />
             </Button>
-          </ItemFooter>
-        </Item>
+          </Widget.Footer>
+        </Widget>
       </div>
 
       <div className="w-full px-2">
         <Separator className="" />
       </div>
 
-      <ScrollArea className="relative h-full max-h-[calc(100%-63px)] pb-2">
-        <div className="flex h-fit w-full flex-col gap-3 p-2">
-          {filteredList.length ? (
-            filteredList.map((message, index) => (
-              <MessagesCard {...message} key={`message-${message.id}-${index}`} />
-            ))
-          ) : (
-            <div className="text-muted-foreground absolute flex size-full flex-col items-center justify-center gap-2">
-              <HatGlasses size={100} className="stroke-1" />
-              <span>Nothing founded.</span>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+      <Widget variant="compact" className="w-full">
+        <Widget.Content className="w-full">
+          <InboxScrollArea list={filteredList} />
+        </Widget.Content>
+      </Widget>
     </section>
   );
 }

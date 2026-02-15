@@ -1,9 +1,9 @@
 'use client';
+import { AnimatedNumberChange } from '@/components/blocks/motion/animated-number-change';
+import { TypographyExtraSmall } from '@/components/blocks/typography/typography-extra-small';
+import { TypographySmall } from '@/components/blocks/typography/typography-small';
 import { Item, ItemContent } from '@/components/ui/item';
 import { cn } from '@/lib/utils';
-import { AnimatedNumberChange } from '../../motion/animated-number-change';
-import { TypographyExtraSmall } from '../../typography/typography-extra-small';
-import { TypographySmall } from '../../typography/typography-small';
 
 interface Props {
   title: string;

@@ -1,9 +1,9 @@
 'use client';
-import { cn } from '@/lib/utils';
+import { AnimatedNumberChange } from '@/components/blocks/motion/animated-number-change';
+import { TypographyExtraSmall } from '@/components/blocks/typography/typography-extra-small';
 import { Item, ItemContent } from '@/components/ui/item';
-import { AnimatedNumberChange } from '../../motion/animated-number-change';
-import { TypographyExtraSmall } from '../../typography/typography-extra-small';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 interface Props {
   prev: number;
@@ -12,7 +12,7 @@ interface Props {
   service_name: string;
 }
 
-function UnpopularServicBlock({ prev, title, value, service_name }: Props) {
+function TopServiceBlock({ prev, title, value, service_name }: Props) {
   return (
     <Item className="flex h-full py-3">
       <ItemContent className="flex h-full flex-col items-start justify-center gap-1.5 overflow-hidden">
@@ -22,7 +22,7 @@ function UnpopularServicBlock({ prev, title, value, service_name }: Props) {
             <span
               className={cn(
                 'w-full overflow-hidden text-base leading-5.25 font-semibold text-nowrap text-ellipsis',
-                'text-red-600'
+                'text-blue-600'
               )}
             >
               {service_name}
@@ -30,7 +30,7 @@ function UnpopularServicBlock({ prev, title, value, service_name }: Props) {
           </TooltipTrigger>
           <TooltipContent>{service_name}</TooltipContent>
         </Tooltip>
-        <span className={cn('align-super text-[10px] opacity-50', 'text-red-600')}>
+        <span className={cn('align-super text-[10px] opacity-50', 'text-blue-600')}>
           <AnimatedNumberChange value={value} Component={TypographyExtraSmall} startValue={prev} />{' '}
           orders vs last month
         </span>
@@ -39,4 +39,4 @@ function UnpopularServicBlock({ prev, title, value, service_name }: Props) {
   );
 }
 
-export default UnpopularServicBlock;
+export default TopServiceBlock;

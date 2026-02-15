@@ -7,10 +7,10 @@ import { TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { eachDayOfInterval, endOfMonth, format, startOfMonth } from 'date-fns';
 import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useWidgetStorage } from '../widgets/widget-storage';
 
 interface Props {
   schedule: Schedule;
-  isResizing: boolean;
 }
 
 function getCalendarDates(month: Date, weekStartsOn: 0 | 1 = 1) {
@@ -20,7 +20,7 @@ function getCalendarDates(month: Date, weekStartsOn: 0 | 1 = 1) {
   });
 }
 
-function MonthTab({ schedule, isResizing }: Props) {
+function MonthTab({ schedule }: Props) {
   const {
     getter: { shownInterval, currTab },
     setter: { setShownInterval, setCurrTab },
@@ -38,6 +38,8 @@ function MonthTab({ schedule, isResizing }: Props) {
 
   // console.log(monthSchedule);
 
+  const { isResizing } = useWidgetStorage();
+
   const calendar = useRef<HTMLDivElement>(null);
 
   return (
@@ -47,7 +49,6 @@ function MonthTab({ schedule, isResizing }: Props) {
           mode="single"
           hideNavigation
           showOutsideDays
-          // onMonthChange={setMonth}
           month={shownInterval}
           className="h-full w-full p-0 **:aspect-auto"
           classNames={{

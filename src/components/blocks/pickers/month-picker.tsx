@@ -25,9 +25,11 @@ export default function MonthPicker({
   onChange,
   defaultYear,
   defaultMonth,
+  triggerProps,
 }: {
   defaultYear?: number;
   defaultMonth?: number;
+  triggerProps?: React.ComponentProps<typeof Button>;
   onChange?: (month: number | undefined, year: number) => void;
 }) {
   const minYear = 2000;
@@ -38,7 +40,9 @@ export default function MonthPicker({
 
   const [open, setOpen] = React.useState(false);
   const [currYear, setCurrYear] = React.useState(maxYear);
-  const [month, setMonth] = React.useState<string | undefined>(months[new Date().getMonth()]);
+  const [month, setMonth] = React.useState<string | undefined>(
+    months[defaultMonth ?? new Date().getMonth()]
+  );
 
   useEffect(() => {
     defaultYear && setCurrYear(defaultYear);
@@ -51,7 +55,11 @@ export default function MonthPicker({
         <Button
           id="date"
           variant="outline"
-          className="w-fit cursor-pointer justify-between font-sans! font-normal"
+          {...triggerProps}
+          className={cn(
+            'w-fit cursor-pointer justify-between font-sans! font-normal',
+            triggerProps?.className
+          )}
         >
           {month ?? 'Mo.'}
           <ChevronDownIcon />

@@ -1,29 +1,21 @@
-import { Button } from '@/components/ui/button';
-import { Item, ItemContent, ItemFooter, ItemHeader } from '@/components/ui/item';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
   Activity,
   AlertTriangle,
-  Bot,
-  BrainCircuit,
   CalendarCheck,
   CalendarX,
   Clock,
   LucideIcon,
   Repeat,
   Sparkles,
-  ThumbsDown,
-  ThumbsUp,
   TrendingUp,
   UserPlus,
   Users,
 } from 'lucide-react';
-import { ComponentProps, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-
-type Props = ComponentProps<typeof Item> & { isResizing: boolean };
 
 type TipColor =
   | 'text-green-600 bg-green-50'
@@ -143,105 +135,37 @@ const aiSecretaryTips: Tip[] = [
   },
 ];
 
-function AITip({ isResizing, ...rest }: Props) {
-  const [maxH, setMaxH] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const [useful, setUseful] = useState<1 | 0 | -1>(0);
-
+function AITipBody() {
   const today_tip = useMemo(() => {
     const max = aiSecretaryTips.length - 1;
     return aiSecretaryTips.at(Math.floor(Math.random() * max))!;
   }, []);
 
-  useLayoutEffect(() => {
-    setMaxH(ref.current?.clientHeight ?? 0);
-    const controller = new AbortController();
-    window.addEventListener('resize', () => setMaxH(ref.current?.clientHeight ?? 0), {
-      signal: controller.signal,
-    });
-
-    return () => controller.abort();
-  }, [ref]);
-
   return (
-    <Item
-      {...rest}
+    <ScrollArea
       className={cn(
-        'h-full min-w-fit flex-col items-start justify-center shadow-[0_0_4px_0] shadow-black/15',
-        rest.className
+        'relative h-[calc(var(--widget-content-height)-102px)] min-h-full w-full rounded-sm px-3 py-2 shadow-[inset_0_0_4px_0] shadow-black/10',
+        today_tip.color
       )}
     >
-      <ItemHeader className="w-full shrink-0 basis-0">
-        <div className="flex items-center gap-2">
-          <Bot size={18} /> <span>AI Secretary</span>
-        </div>
-      </ItemHeader>
-      <ItemContent
-        ref={ref}
-        className="flex min-h-fit w-full basis-0 flex-row items-center justify-between"
-      >
-        <ScrollArea
-          style={{ height: `${maxH}px` }}
-          className={cn(
-            'relative min-h-full w-full rounded-sm px-3 py-2 shadow-[inset_0_0_4px_0] shadow-black/10',
-            today_tip.color
-          )}
-        >
-          <article className="flex size-full flex-col gap-1.75">
-            <h2 className="mt-px flex items-center gap-2 text-base font-semibold uppercase">
-              <today_tip.icon size={16} /> {today_tip?.title}
-            </h2>
-            <Separator className={cn('h-0.5! mix-blend-multiply brightness-95', today_tip.color)} />
+      <article className="flex size-full flex-col gap-1.75">
+        <h2 className="mt-px flex items-center gap-2 text-base font-semibold uppercase">
+          <today_tip.icon size={16} /> {today_tip?.title}
+        </h2>
+        <Separator className={cn('h-0.5! mix-blend-multiply brightness-95', today_tip.color)} />
 
-            <ul className="flex list-disc flex-col gap-2 pl-5.25">
-              {today_tip?.tips.map((tip) => {
-                return (
-                  <li key={`tip-${tip}`}>
-                    <ReactMarkdown>{tip}</ReactMarkdown>
-                  </li>
-                );
-              })}
-            </ul>
-          </article>
-        </ScrollArea>
-      </ItemContent>
-
-      <ItemFooter className="flex w-full shrink-0 basis-0 justify-start *:cursor-pointer">
-        <Button
-          size={'sm'}
-          variant={'secondary'}
-          onClick={() => setUseful((cur) => (cur === 1 ? 0 : 1))}
-          className={cn(
-            'hover:bg-emerald-100 hover:text-emerald-600 hover:brightness-95',
-            useful === 1 && 'bg-emerald-100 text-emerald-600'
-          )}
-        >
-          <ThumbsUp />
-        </Button>
-
-        <Button
-          size={'sm'}
-          variant={'secondary'}
-          onClick={() => setUseful((cur) => (cur === -1 ? 0 : -1))}
-          className={cn(
-            'hover:bg-rose-100 hover:text-rose-600 hover:brightness-95',
-            useful === -1 && 'bg-rose-100 text-rose-600'
-          )}
-        >
-          <ThumbsDown />
-        </Button>
-
-        <Button
-          size={'sm'}
-          variant={'secondary'}
-          className="hover:bg-fuchsia-100 hover:text-fuchsia-600"
-        >
-          <BrainCircuit />
-          <span>Generate new tip</span>
-        </Button>
-      </ItemFooter>
-    </Item>
+        <ul className="flex list-disc flex-col gap-2 pl-5.25">
+          {today_tip?.tips.map((tip) => {
+            return (
+              <li key={`tip-${tip}`}>
+                <ReactMarkdown>{tip}</ReactMarkdown>
+              </li>
+            );
+          })}
+        </ul>
+      </article>
+    </ScrollArea>
   );
 }
 
-export default AITip;
+export default AITipBody;

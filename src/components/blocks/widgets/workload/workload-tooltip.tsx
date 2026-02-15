@@ -1,7 +1,6 @@
 import { Item, ItemContent, ItemFooter, ItemHeader } from '@/components/ui/item';
 import { Separator } from '@/components/ui/separator';
 import { Info, Square } from 'lucide-react';
-import { useMemo } from 'react';
 import { Tooltip } from 'recharts';
 
 function WorkloadTooltip() {
@@ -30,8 +29,6 @@ function WorkloadTooltip() {
                 ))
                 .reverse()}
             </ItemContent>
-            {/* {payload[0].name !== 'leisure' && (
-              <> */}
             <Separator />
             <ItemFooter className="p-2">
               <div className="flex w-full font-semibold capitalize">
@@ -45,8 +42,6 @@ function WorkloadTooltip() {
                 </span>
               </div>
             </ItemFooter>
-            {/* </>
-            )} */}
           </Item>
         );
       }}

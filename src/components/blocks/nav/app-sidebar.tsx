@@ -162,7 +162,7 @@ export function AppSidebar() {
         </AnimatePresence>
       </SidebarHeader>
       <SidebarSeparator className="m-0" />
-      <SidebarContent>
+      <SidebarContent className="custom-scrollbar">
         {sidebar_groups.map((group) => (
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>

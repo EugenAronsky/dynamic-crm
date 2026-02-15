@@ -4,6 +4,7 @@ import { getMiddleDate } from '@/components/blocks/full-calendar/halpers';
 import ListTab from '@/components/blocks/full-calendar/list-tab';
 import MonthTab from '@/components/blocks/full-calendar/month-tab';
 import WeekTab from '@/components/blocks/full-calendar/week-tab';
+import Widget from '@/components/blocks/widgets/widget';
 import { Button } from '@/components/ui/button';
 import { Item, ItemHeader } from '@/components/ui/item';
 import { Separator } from '@/components/ui/separator';
@@ -11,7 +12,6 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useIsResizing } from '@/hooks/use-is-resizing';
 import {
   addDays,
-  differenceInMilliseconds,
   endOfMonth,
   endOfWeek,
   format,
@@ -19,15 +19,11 @@ import {
   getTime,
   startOfMonth,
   startOfWeek,
-  subDays,
 } from 'date-fns';
-import { create } from 'domain';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { createContext, Dispatch, SetStateAction, useState } from 'react';
+import { createContext, Dispatch, SetStateAction, useMemo, useState } from 'react';
 
 const workTimeLimit = { start: 8, end: 18 };
-
-const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const data: Schedule = [
   {
@@ -334,9 +330,8 @@ export const ShownDateInterval = createContext({
 });
 
 export default function Calendar() {
-  const [currTab, setCurrTab] = useState<'month' | 'week' | 'day' | 'list' | ({} & string)>('week');
-  const { ref, isResizing } = useIsResizing({ delay: 10 });
   const [shownInterval, setShownInterval] = useState(new Date());
+  const [currTab, setCurrTab] = useState<'month' | 'week' | 'day' | 'list' | ({} & string)>('week');
 
   const intervalStep = (dir: -1 | 1) => {
     let end, start;
@@ -387,6 +382,8 @@ export default function Calendar() {
     }
   };
 
+  const title = useMemo(() => getDateTitle(), [shownInterval, currTab]);
+
   return (
     <ShownDateInterval.Provider
       value={{
@@ -394,45 +391,47 @@ export default function Calendar() {
         setter: { setShownInterval: setShownInterval, setCurrTab: setCurrTab },
       }}
     >
-      <Item
-        ref={ref}
-        className="m-2 flex min-h-0 flex-1 flex-col gap-0 overflow-hidden p-0 shadow-[0_0_4px_0] shadow-black/22"
+      <Widget
+        variant="default"
+        className="relative m-2 flex max-h-[calc(100%-16px)] min-h-0 flex-1 flex-col gap-0 overflow-hidden p-0"
       >
-        <Tabs
-          value={currTab}
-          defaultValue="week"
-          onValueChange={setCurrTab}
-          className="flex h-full min-h-0 w-full flex-col gap-0"
-        >
-          <ItemHeader className="w-full basis-0 justify-between p-3 *:w-full">
-            <h1 className="text-lg">{getDateTitle()}</h1>
-            <TabsList className="*:w-26 *:cursor-pointer *:font-normal">
-              <TabsTrigger value="month">Month</TabsTrigger>
-              <TabsTrigger value="week">Week</TabsTrigger>
-              <TabsTrigger value="day">Day</TabsTrigger>
-              <TabsTrigger value="list">List</TabsTrigger>
-            </TabsList>
+        <Widget.Content className="max-h-full *:max-h-full">
+          <Tabs
+            value={currTab}
+            defaultValue="week"
+            onValueChange={setCurrTab}
+            className="flex h-full min-h-0 w-full flex-col gap-0"
+          >
+            <ItemHeader className="w-full basis-0 justify-between p-3 *:w-full">
+              <h1 className="text-lg">{title}</h1>
+              <TabsList className="*:w-26 *:cursor-pointer *:font-normal">
+                <TabsTrigger value="month">Month</TabsTrigger>
+                <TabsTrigger value="week">Week</TabsTrigger>
+                <TabsTrigger value="day">Day</TabsTrigger>
+                <TabsTrigger value="list">List</TabsTrigger>
+              </TabsList>
 
-            <div className="flex justify-end gap-2 *:cursor-pointer *:shadow-sm">
-              <Button onClick={() => intervalStep(-1)} variant="ghost" size={'icon'}>
-                <ChevronLeft />
-              </Button>
-              <Button onClick={() => setShownInterval(new Date())} variant="ghost">
-                Today
-              </Button>
-              <Button onClick={() => intervalStep(1)} variant="ghost" size={'icon'}>
-                <ChevronRight />
-              </Button>
-            </div>
-          </ItemHeader>
-          <Separator />
+              <div className="flex justify-end gap-2 *:cursor-pointer *:shadow-sm">
+                <Button onClick={() => intervalStep(-1)} variant="ghost" size={'icon'}>
+                  <ChevronLeft />
+                </Button>
+                <Button onClick={() => setShownInterval(new Date())} variant="ghost">
+                  Today
+                </Button>
+                <Button onClick={() => intervalStep(1)} variant="ghost" size={'icon'}>
+                  <ChevronRight />
+                </Button>
+              </div>
+            </ItemHeader>
+            <Separator />
 
-          <MonthTab schedule={data} isResizing={isResizing} />
-          <WeekTab schedule={data} workTimeLimit={workTimeLimit} />
-          <DayTab schedule={data} workTimeLimit={workTimeLimit} />
-          <ListTab schedule={data} workTimeLimit={workTimeLimit} />
-        </Tabs>
-      </Item>
+            <MonthTab schedule={data} />
+            <WeekTab schedule={data} workTimeLimit={workTimeLimit} />
+            <DayTab schedule={data} workTimeLimit={workTimeLimit} />
+            <ListTab schedule={data} workTimeLimit={workTimeLimit} />
+          </Tabs>
+        </Widget.Content>
+      </Widget>
     </ShownDateInterval.Provider>
   );
 }

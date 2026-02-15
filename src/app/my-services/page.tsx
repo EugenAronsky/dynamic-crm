@@ -1,7 +1,10 @@
-import Statistics from '@/components/blocks/widgets/statistics/statistics';
+'use client';
+import Pipeline from '@/components/blocks/widgets/pipeline/pipeline';
 import { Separator } from '@/components/ui/separator';
 import { columns, Service } from './columns';
 import { DataTable } from './data-table';
+import Widget from '@/components/blocks/widgets/widget';
+import { AnyBlockConfig } from '@/components/blocks/widgets/pipeline/pipeline-body';
 
 const data: Service[] = [
   {
@@ -174,65 +177,68 @@ const data: Service[] = [
   },
 ];
 
+const PipelineBlocks: AnyBlockConfig[] = [
+  {
+    type: 'Income',
+    props: {
+      hours: { prev: 120, value: 145 },
+      income: { prev: 2040, value: 3880 },
+      mode: 'pre-hour',
+      title: 'Income',
+    },
+  },
+  {
+    type: 'AverageProfitBlock',
+    props: {
+      prev: 45,
+      value: 54,
+      title: 'Avg Profit',
+    },
+  },
+  {
+    type: 'UtilizationBlock',
+    props: {
+      title: 'Utilization Time',
+      prev: { hours: 75, total_hours: 120 },
+      value: { hours: 70, total_hours: 120 },
+    },
+  },
+  {
+    type: 'TopServiceBlock',
+    props: {
+      prev: 1,
+      value: 2,
+      title: 'Top Service',
+      service_name: 'Custom Furniture Production',
+    },
+  },
+  {
+    type: 'UnpopularServicBlock',
+    props: {
+      prev: 2,
+      value: 0,
+      title: 'Unpopular Service',
+      service_name: 'Pipe Leak Repair',
+    },
+  },
+];
+
 export default function MyServices() {
   return (
     <section className="flex flex-1 flex-col">
       <div className="w-full p-2">
-        <Statistics
-          blocks={[
-            {
-              type: 'Income',
-              props: {
-                hours: { prev: 120, value: 145 },
-                income: { prev: 2040, value: 3880 },
-                mode: 'pre-hour',
-                title: 'Income',
-              },
-            },
-            {
-              type: 'AverageProfitBlock',
-              props: {
-                prev: 45,
-                value: 54,
-                title: 'Avg Profit',
-              },
-            },
-            {
-              type: 'UtilizationBlock',
-              props: {
-                title: 'Utilization Time',
-                prev: { hours: 75, total_hours: 120 },
-                value: { hours: 70, total_hours: 120 },
-              },
-            },
-            {
-              type: 'TopServiceBlock',
-              props: {
-                prev: 1,
-                value: 2,
-                title: 'Top Service',
-                service_name: 'Custom Furniture Production',
-              },
-            },
-            {
-              type: 'UnpopularServicBlock',
-              props: {
-                prev: 2,
-                value: 0,
-                title: 'Unpopular Service',
-                service_name: 'Pipe Leak Repair',
-              },
-            },
-          ]}
-          isResizing
-        />
+        <Pipeline blocks={PipelineBlocks} />
       </div>
 
       <div className="w-full px-2">
         <Separator className="" />
       </div>
 
-      <DataTable columns={columns} data={data} />
+      <Widget variant="compact">
+        <Widget.Content>
+          <DataTable columns={columns} data={data} />
+        </Widget.Content>
+      </Widget>
     </section>
   );
 }

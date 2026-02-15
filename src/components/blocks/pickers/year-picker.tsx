@@ -26,9 +26,11 @@ const chunkArray = ({
 export default function YearPicker({
   defaultYear,
   onChange,
+  triggerProps,
 }: {
   defaultYear?: number;
   onChange?: (year: number) => void;
+  triggerProps?: React.ComponentProps<typeof Button>;
 }) {
   const minYear = 2000;
   const maxYear = new Date().getFullYear();
@@ -40,10 +42,7 @@ export default function YearPicker({
   const [year, setYear] = React.useState<number | undefined>(maxYear);
 
   useEffect(() => {
-    if (defaultYear) {
-      setYear(defaultYear);
-      onChange && onChange(defaultYear);
-    }
+    defaultYear && setYear(defaultYear);
   }, [defaultYear]);
 
   return (
@@ -52,7 +51,11 @@ export default function YearPicker({
         <Button
           id="date"
           variant="outline"
-          className="w-fit cursor-pointer justify-between font-sans! font-normal"
+          {...triggerProps}
+          className={cn(
+            'w-fit cursor-pointer justify-between font-sans! font-normal',
+            triggerProps?.className
+          )}
         >
           {year ?? 'Select year'}
           <ChevronDownIcon />

@@ -1,90 +1,23 @@
 'use client';
 import { AnimatedNumberChange } from '@/components/blocks/motion/animated-number-change';
 import { TypographyExtraSmall } from '@/components/blocks/typography/typography-extra-small';
-import { TypographySmall } from '@/components/blocks/typography/typography-small';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import Pipeline from '@/components/blocks/widgets/pipeline/pipeline';
+import { AnyBlockConfig } from '@/components/blocks/widgets/pipeline/pipeline-body';
+import Widget from '@/components/blocks/widgets/widget';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Item, ItemDescription, ItemFooter, ItemHeader } from '@/components/ui/item';
+import { Item, ItemFooter, ItemHeader } from '@/components/ui/item';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
-import { format } from 'date-fns';
-import {
-  AlertCircle,
-  AtSign,
-  BellDot,
-  BellRing,
-  Bot,
-  CalendarCheck,
-  CalendarX,
-  Circle,
-  Crown,
-  EllipsisVertical,
-  Hammer,
-  HatGlasses,
-  LucideIcon,
-  Mail,
-  MailOpen,
-  Notebook,
-  PenBox,
-  PenToolIcon,
-  Pin,
-  Plus,
-  RotateCcw,
-  Search,
-  Settings,
-  ShieldAlert,
-  SortAsc,
-  SortDesc,
-  Tag,
-  Trash2,
-  TriangleAlert,
-  UploadCloud,
-  UserPlus,
-  UserPlus2,
-  Users,
-} from 'lucide-react';
-import Link from 'next/link';
-import { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { Crown, LucideIcon, Notebook, Pin, Plus, ShieldAlert, UserPlus, Users } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import ClientScrollArea from './client-scroll-area';
+import SearchInput from './search-input';
 
 type StatusColors = 'blue' | 'amber' | 'emerald' | 'fuchsia' | 'red';
 type ClientStatus = 'regular' | 'new' | 'demanding' | 'VIP';
 type RadioCategories = ClientStatus | 'all';
-
-const StatusColorsObject: Record<RadioCategories, StatusColors> = {
-  all: 'blue',
-  VIP: 'fuchsia',
-  new: 'emerald',
-  demanding: 'red',
-  regular: 'amber',
-};
 
 const radio_categories: { value: RadioCategories; icon: LucideIcon; color: StatusColors }[] = [
   {
@@ -114,7 +47,7 @@ const radio_categories: { value: RadioCategories; icon: LucideIcon; color: Statu
   },
 ];
 
-type Client = {
+export type Client = {
   name: string;
   phone: string;
   income: number;
@@ -328,174 +261,53 @@ const clientsList: Client[] = [
   },
 ];
 
-function ClientCard({
-  name,
-  phone,
-  status,
-  income,
-  lastVisit,
-  totalVisits,
-  description,
-  isAIAssists,
-}: Client) {
-  return (
-    <Card className="gap-3 overflow-hidden border-none p-0 shadow-[0_0_4px_0] shadow-black/15">
-      <CardHeader className="flex justify-between p-3 pb-0">
-        <div className="flex items-center gap-3">
-          <Avatar
-            className={cn(
-              StatusColorsObject[status] === 'blue' && 'text-blue-600 *:bg-blue-100',
-              StatusColorsObject[status] === 'amber' && 'text-amber-600 *:bg-amber-100',
-              StatusColorsObject[status] === 'emerald' && 'text-emerald-600 *:bg-emerald-100',
-              StatusColorsObject[status] === 'fuchsia' && 'text-fuchsia-600 *:bg-fuchsia-100',
-              StatusColorsObject[status] === 'red' && 'text-red-600 *:bg-red-100',
-              'size-12'
-            )}
-          >
-            <AvatarImage />
-            <AvatarFallback className="text-lg">
-              {name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <CardTitle className="text-sm">{name}</CardTitle>
-            <Link href={`tel:${phone}`} className="cursor-pointer">
-              <CardDescription className="text-sm">{phone}</CardDescription>
-            </Link>
-          </div>
-        </div>
+const PipelineBlocks: AnyBlockConfig[] = [
+  {
+    type: 'Income',
+    props: {
+      hours: { prev: 120, value: 145 },
+      income: { prev: 2040, value: 3880 },
+      mode: 'pre-hour',
+      title: 'Income',
+    },
+  },
+  {
+    type: 'AverageProfitBlock',
+    props: {
+      prev: 45,
+      value: 54,
+      title: 'Avg Profit',
+    },
+  },
+  {
+    type: 'UtilizationBlock',
+    props: {
+      title: 'Utilization Time',
+      prev: { hours: 75, total_hours: 120 },
+      value: { hours: 70, total_hours: 120 },
+    },
+  },
+  {
+    type: 'TopServiceBlock',
+    props: {
+      prev: 1,
+      value: 2,
+      title: 'Top Service',
+      service_name: 'Custom Furniture Production',
+    },
+  },
+  {
+    type: 'UnpopularServicBlock',
+    props: {
+      prev: 2,
+      value: 0,
+      title: 'Unpopular Service',
+      service_name: 'Pipe Leak Repair',
+    },
+  },
+];
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size={'icon'} className="cursor-pointer" variant={'ghost'}>
-              <EllipsisVertical />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuGroup className="*:cursor-pointer">
-              <DropdownMenuItem>
-                <PenBox />
-                <span>Edit</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
-                <Trash2 />
-                <span>Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </CardHeader>
-
-      <CardContent className="flex grow flex-col gap-3 px-3">
-        <span
-          className={cn(
-            'bg-muted border-border flex grow flex-col gap-1 rounded-sm border p-2 text-xs',
-            status === 'demanding' && 'text-destructive bg-destructive/10 border-destructive/10',
-            isAIAssists && 'border-sky-600/10 bg-sky-600/10 text-sky-600'
-          )}
-        >
-          {isAIAssists && (
-            <b className="flex items-center gap-1 uppercase">
-              <Bot size={14} />
-              AI Note
-            </b>
-          )}
-          {status === 'demanding' && (
-            <b className="flex items-center gap-1 uppercase">
-              <AlertCircle size={14} /> Requires Attention
-            </b>
-          )}
-          {!isAIAssists && status !== 'demanding' && (
-            <b className="flex items-center gap-1 uppercase">
-              <PenToolIcon size={14} /> Note
-            </b>
-          )}
-          <p className="grow rounded-sm">"{description}"</p>
-        </span>
-        <Separator />
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col justify-between gap-2">
-            <span className="text-muted-foreground text-xs">Last Visit</span>
-            <TypographySmall className="h-[18.4px]">
-              {format(lastVisit, 'dd MMM yyyy')}
-            </TypographySmall>
-          </div>
-
-          <div className="flex flex-col gap-0.75">
-            <span className="text-muted-foreground text-xs">Total Visits</span>
-            <span className="">
-              <AnimatedNumberChange
-                fixed={0}
-                startValue={0}
-                value={totalVisits}
-                Component={TypographySmall}
-              />{' '}
-              (
-              <AnimatedNumberChange
-                fixed={0}
-                prefix="$"
-                startValue={0}
-                value={income}
-                Component={TypographySmall}
-              />
-              )
-            </span>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="border-border flex items-end justify-between border-t p-3!">
-        <Badge
-          className={cn(
-            StatusColorsObject[status] === 'blue' && 'bg-blue-200 text-blue-600',
-            StatusColorsObject[status] === 'amber' && 'bg-amber-200 text-amber-600',
-            StatusColorsObject[status] === 'emerald' && 'bg-emerald-200 text-emerald-600',
-            StatusColorsObject[status] === 'fuchsia' && 'bg-fuchsia-200 text-fuchsia-600',
-            StatusColorsObject[status] === 'red' && 'bg-red-200 text-red-600',
-            'rounded-sm text-xs capitalize'
-          )}
-        >
-          {status}
-        </Badge>
-
-        <Button
-          size={'sm'}
-          variant={'link'}
-          className="h-auto cursor-pointer text-xs font-semibold"
-        >
-          History 👉
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-}
-
-const normalize = (s: string) => s.replace(/\s+/g, '').toLowerCase();
-
-function SearchInput({ onChange }: { onChange?: (str: string) => void }) {
-  const [search, setSearch] = useState<string>('');
-  const deferredSearch = useDeferredValue(search);
-
-  useEffect(() => {
-    const id = setTimeout(() => onChange && onChange(normalize(deferredSearch).trim()), 200);
-    return () => clearTimeout(id);
-  }, [deferredSearch]);
-
-  return (
-    <Label className="relative">
-      <Search size={20} className="text-muted-foreground absolute left-2" />
-      <Input
-        value={search}
-        className="w-68 pl-9"
-        placeholder="Search by name or number..."
-        onChange={(e) => setSearch(e.target.value)}
-      />
-    </Label>
-  );
-}
+export const normalize = (s: string) => s.replace(/\s+/g, '').toLowerCase();
 
 export default function Clients() {
   const [search, setSearch] = useState<string>('');
@@ -513,9 +325,12 @@ export default function Clients() {
 
   return (
     <section className="flex flex-1 flex-col">
-      <div className="w-full p-2">
-        <Item className="flex w-full flex-row flex-nowrap justify-between bg-white p-2 shadow-[0_0_4px_0] shadow-black/15">
-          <ItemHeader className="w-fit basis-auto items-end gap-1.25 pl-1.5">
+      <Widget
+        variant="default"
+        className="m-2 mb-0 flex h-fit min-h-fit w-[calc(100%-16px)] flex-row flex-nowrap items-center justify-between bg-white p-2"
+      >
+        <Widget.Header className="w-fit basis-auto items-end gap-1.25 pl-1.5">
+          <Widget.Title className="gap-1">
             <div className="flex items-center gap-2 font-semibold">
               <Users size={16} />
               <span>
@@ -533,70 +348,67 @@ export default function Clients() {
               />
               )
             </span>
-          </ItemHeader>
-          <ItemFooter className="basis-auto flex-col gap-2">
-            <div className="flex gap-2">
-              <SearchInput onChange={(value) => setSearch(value)} />
-              <Button className="cursor-pointer bg-blue-500! hover:brightness-95">
-                <span>Add new</span>
-                <Plus />
-              </Button>
-            </div>
-          </ItemFooter>
-        </Item>
+          </Widget.Title>
+        </Widget.Header>
+        <Widget.Footer className="">
+          <div className="flex gap-2">
+            <SearchInput onChange={(value) => setSearch(value)} />
+            <Button className="cursor-pointer bg-blue-500! hover:brightness-95">
+              <span>Add new</span>
+              <Plus />
+            </Button>
+          </div>
+        </Widget.Footer>
+      </Widget>
+
+      <div className="w-full p-2">
+        <Pipeline blocks={PipelineBlocks} />
       </div>
 
-      <div className="flex w-full justify-start px-2">
-        <RadioGroup
-          defaultValue="all"
-          className="flex gap-2 *:cursor-pointer"
-          onValueChange={(value) => setStatus(value as RadioCategories)}
-        >
-          {radio_categories.map((category) => (
-            <Label key={`radio-category-${category.value}`}>
-              <RadioGroupItem className="peer sr-only" value={category.value} />
-              <span
-                className={cn(
-                  'flex h-6.5 items-center gap-1 rounded-full border py-1 pr-1.75 pl-3 text-xs hover:brightness-95',
+      <Widget variant="compact" className="h-fit min-h-fit px-2">
+        <Widget.Content>
+          <RadioGroup
+            defaultValue="all"
+            className="flex gap-2 *:cursor-pointer"
+            onValueChange={(value) => setStatus(value as RadioCategories)}
+          >
+            {radio_categories.map((category) => (
+              <Label key={`radio-category-${category.value}`}>
+                <RadioGroupItem className="peer sr-only" value={category.value} />
+                <span
+                  className={cn(
+                    'flex h-6.5 items-center gap-1 rounded-full border py-1 pr-1.75 pl-3 text-xs hover:brightness-95',
 
-                  category.color === 'blue' &&
-                    'peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-100 peer-data-[state=checked]:text-blue-600',
-                  category.color === 'amber' &&
-                    'peer-data-[state=checked]:border-amber-600 peer-data-[state=checked]:bg-amber-100 peer-data-[state=checked]:text-amber-600',
-                  category.color === 'emerald' &&
-                    'peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-100 peer-data-[state=checked]:text-emerald-600',
-                  category.color === 'fuchsia' &&
-                    'peer-data-[state=checked]:border-fuchsia-600 peer-data-[state=checked]:bg-fuchsia-100 peer-data-[state=checked]:text-fuchsia-600',
-                  category.color === 'red' &&
-                    'peer-data-[state=checked]:border-red-600 peer-data-[state=checked]:bg-red-100 peer-data-[state=checked]:text-red-600'
-                )}
-              >
-                <span className="capitalize">{category.value}</span>
-                <category.icon className="h-full" />
-              </span>
-            </Label>
-          ))}
-        </RadioGroup>
-      </div>
+                    category.color === 'blue' &&
+                      'peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-100 peer-data-[state=checked]:text-blue-600',
+                    category.color === 'amber' &&
+                      'peer-data-[state=checked]:border-amber-600 peer-data-[state=checked]:bg-amber-100 peer-data-[state=checked]:text-amber-600',
+                    category.color === 'emerald' &&
+                      'peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-100 peer-data-[state=checked]:text-emerald-600',
+                    category.color === 'fuchsia' &&
+                      'peer-data-[state=checked]:border-fuchsia-600 peer-data-[state=checked]:bg-fuchsia-100 peer-data-[state=checked]:text-fuchsia-600',
+                    category.color === 'red' &&
+                      'peer-data-[state=checked]:border-red-600 peer-data-[state=checked]:bg-red-100 peer-data-[state=checked]:text-red-600'
+                  )}
+                >
+                  <span className="capitalize">{category.value}</span>
+                  <category.icon className="h-full" />
+                </span>
+              </Label>
+            ))}
+          </RadioGroup>
+        </Widget.Content>
+      </Widget>
 
       <div className="w-full p-2">
         <Separator className="" />
       </div>
 
-      <ScrollArea className="relative h-full max-h-[calc(100%-105px)] pb-2">
-        <div className="grid h-fit w-full grid-cols-3 gap-3 p-2">
-          {filterdList.length ? (
-            filterdList.map((client, index) => (
-              <ClientCard {...client} key={`message-${client.name}-${index}`} />
-            ))
-          ) : (
-            <div className="text-muted-foreground absolute flex size-full flex-col items-center justify-center gap-2">
-              <HatGlasses size={100} className="stroke-1" />
-              <span>Nothing founded.</span>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+      <Widget variant="compact" className="w-full">
+        <Widget.Content className="w-full">
+          <ClientScrollArea list={filterdList} />
+        </Widget.Content>
+      </Widget>
     </section>
   );
 }
