@@ -4,6 +4,7 @@ import DaySchedule from '@/components/blocks/widgets/day-schedule/day-schedule';
 import Pipeline from '@/components/blocks/widgets/pipeline/pipeline';
 import { AnyBlockConfig } from '@/components/blocks/widgets/pipeline/pipeline-body';
 import QuickActions from '@/components/blocks/widgets/quick-actions/quick-actions';
+import { useEffect, useRef, useState } from 'react';
 
 const PipelineBlocks: AnyBlockConfig[] = [
   {
@@ -50,12 +51,32 @@ const PipelineBlocks: AnyBlockConfig[] = [
 ];
 
 export default function Dashboard() {
+  const [height, setHeight] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setHeight((containerRef.current?.clientHeight ?? 0) - (headerRef.current?.clientHeight ?? 0));
+  }, [headerRef, containerRef]);
+
   return (
-    <div className="grid h-full min-h-0 min-w-0 flex-1 grid-cols-28 grid-rows-[auto_1fr_1fr] items-start gap-2 p-2 will-change-[wight]">
-      <Pipeline className="col-span-28" blocks={PipelineBlocks} />
-      <DaySchedule className="col-span-14 row-span-2" />
-      <AITip className="col-span-14" />
-      <QuickActions className="col-span-14" />
+    <div
+      ref={containerRef}
+      className="custom-scrollbar relative flex min-w-210 flex-1 flex-col items-start gap-2 p-2 will-change-[wight]"
+    >
+      <div ref={headerRef} className="w-full">
+        <Pipeline className="w-full" blocks={PipelineBlocks} />
+      </div>
+      <div
+        style={{
+          height: height ? `${height}px` : '',
+        }}
+        className="grid min-h-152 w-full grid-cols-2 grid-rows-2 gap-2"
+      >
+        <DaySchedule className="row-span-2" />
+        <AITip className="" />
+        <QuickActions className="" />
+      </div>
     </div>
   );
 }

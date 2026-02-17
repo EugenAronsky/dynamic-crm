@@ -11,7 +11,6 @@ import {
   ChevronRight,
   ChevronsUpDown,
   ClipboardClock,
-  Contact,
   CreditCard,
   FolderClock,
   FolderKanban,
@@ -81,7 +80,7 @@ interface MenuPops extends MenuItemProps {
   submenu?: Array<MenuItemProps>;
 }
 
-const sidebar_groups: SidebarGroupProps[] = [
+export const sidebar_groups: SidebarGroupProps[] = [
   {
     label: 'Platform',
     menu: [

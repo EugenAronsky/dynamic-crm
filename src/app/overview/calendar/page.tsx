@@ -393,7 +393,7 @@ export default function Calendar() {
     >
       <Widget
         variant="default"
-        className="relative m-2 flex max-h-[calc(100%-16px)] min-h-0 flex-1 flex-col gap-0 overflow-hidden p-0"
+        className="relative m-2 flex max-h-[calc(100%-16px)] min-h-0 min-w-220 flex-1 flex-col gap-0 overflow-hidden p-0"
       >
         <Widget.Content className="max-h-full *:max-h-full">
           <Tabs

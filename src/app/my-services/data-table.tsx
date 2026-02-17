@@ -40,7 +40,7 @@ import {
   SquareDashedMousePointer,
   Trash2,
 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { is } from 'date-fns/locale';
 
 interface DataTableProps<TData, TValue> {
@@ -142,7 +142,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           '*:h-full *:max-h-full *:overflow-hidden *:rounded-md *:shadow-[0_0_4px_0] *:shadow-black/15'
         )}
       >
-        <Table className="relative table-fixed">
+        <Table className="relative max-h-full table-fixed overflow-hidden">
           <TableHeader className="flex w-full border-b bg-slate-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
@@ -163,10 +163,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           </TableHeader>
           <TableBody
             className={cn(
-              'max-h-[calc(var(--widget-content-height)-100px)] min-h-[calc(var(--widget-content-height)-100px)]',
-              'custom-scrollbar flex w-full min-w-full flex-col overflow-y-scroll transition-all',
+              'max-h-[calc(var(--widget-content-height)-104px)] min-h-[calc(var(--widget-content-height)-104px)]',
+              'custom-scrollbar flex w-full min-w-full flex-col overflow-y-scroll transition-[max-height,min-height]',
               isSelected &&
-                'max-h-[calc(var(--widget-content-height)-151px)] min-h-[calc(var(--widget-content-height)-151px)]'
+                'max-h-[calc(var(--widget-content-height)-149px)] min-h-[calc(var(--widget-content-height)-149px)]'
             )}
           >
             {table.getRowModel().rows?.length ? (

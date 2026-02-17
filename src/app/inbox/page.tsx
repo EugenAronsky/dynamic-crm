@@ -29,7 +29,7 @@ import {
   Tag,
   TriangleAlert,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import InboxScrollArea from './inbox-scroll-area';
 
 export type Message = {
@@ -301,6 +301,9 @@ const testMessages: Message[] = [
 ];
 
 export default function Inbox() {
+  const [height, setHeight] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
+
   const [sorted, setSorted] = useState(false);
   const [type, setType] = useState<Message['type'] | undefined>();
   const [status, setStatus] = useState<Message['status'] | undefined>();
@@ -318,111 +321,122 @@ export default function Inbox() {
     return type ? statusList.filter((message) => message.type === type) : statusList;
   }, [status, type, sorted]);
 
+  useEffect(() => {
+    setHeight(headerRef.current?.clientHeight ?? 0);
+  }, [headerRef.current?.clientHeight]);
+
   return (
-    <section className="flex flex-1 flex-col">
-      <div className="w-full p-2">
-        <Widget className="flex h-fit min-h-fit w-full flex-row flex-nowrap items-center justify-between p-2">
-          <Widget.Header className="w-fit basis-auto items-end gap-1.25 pl-1.5">
-            <Widget.Title className="gap-1">
-              <div className="flex gap-2 font-semibold">
-                <AtSign size={16} className="mt-0.75" />
-                <span className="capitalize">{status ?? 'All'}</span>
-                {type && <span className="capitalize">{type}</span>}
-                <span>messages</span>
-              </div>
-              <span className="-translate-y-1 text-xs">
-                (
-                <AnimatedNumberChange
-                  value={filteredList.length}
-                  startValue={0}
-                  fixed={0}
-                  postfix=""
-                  Component={TypographyExtraSmall}
-                />
-                )
-              </span>
-            </Widget.Title>
-          </Widget.Header>
-          <Widget.Footer className="*:cursor-pointer">
-            <Button onClick={() => setSorted((cur) => !cur)} variant={'outline'} size={'icon'}>
-              {sorted ? <SortAsc /> : <SortDesc />}
-            </Button>
+    <div className="flex min-w-210 flex-1 flex-col">
+      <div ref={headerRef} className="flex flex-col">
+        <div className="w-full p-2">
+          <Widget className="flex h-fit min-h-fit w-full flex-row flex-nowrap items-center justify-between p-2">
+            <Widget.Header className="w-fit basis-auto items-end gap-1.25 pl-1.5">
+              <Widget.Title className="gap-1">
+                <div className="flex gap-2 font-semibold">
+                  <AtSign size={16} className="mt-0.75" />
+                  <span className="capitalize">{status ?? 'All'}</span>
+                  {type && <span className="capitalize">{type}</span>}
+                  <span>messages</span>
+                </div>
+                <span className="-translate-y-1 text-xs">
+                  (
+                  <AnimatedNumberChange
+                    value={filteredList.length}
+                    startValue={0}
+                    fixed={0}
+                    postfix=""
+                    Component={TypographyExtraSmall}
+                  />
+                  )
+                </span>
+              </Widget.Title>
+            </Widget.Header>
+            <Widget.Footer className="*:cursor-pointer">
+              <Button onClick={() => setSorted((cur) => !cur)} variant={'outline'} size={'icon'}>
+                {sorted ? <SortAsc /> : <SortDesc />}
+              </Button>
 
-            <Select value={status} key={`status-select-${status}`}>
-              <SelectTrigger className="capitalize">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent align="end" position="popper">
-                <SelectGroup>
-                  {MessageStatusArray.map((status) => {
-                    const Icon = messageStatusIcons[status];
-                    return (
-                      <SelectItem
-                        value={status}
-                        className="capitalize"
-                        key={`select-item-${status}`}
-                        onPointerDown={() =>
-                          setStatus((curr) => (curr === status ? undefined : status))
-                        }
-                      >
-                        <Icon />
-                        <span>{status}</span>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+              <Select value={status} key={`status-select-${status}`}>
+                <SelectTrigger className="capitalize">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent align="end" position="popper">
+                  <SelectGroup>
+                    {MessageStatusArray.map((status) => {
+                      const Icon = messageStatusIcons[status];
+                      return (
+                        <SelectItem
+                          value={status}
+                          className="capitalize"
+                          key={`select-item-${status}`}
+                          onPointerDown={() =>
+                            setStatus((curr) => (curr === status ? undefined : status))
+                          }
+                        >
+                          <Icon />
+                          <span>{status}</span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
 
-            <Select value={type} key={`type-select-${type}`}>
-              <SelectTrigger className="capitalize">
-                <SelectValue placeholder={'Type'} />
-              </SelectTrigger>
-              <SelectContent align="end" position="popper">
-                <SelectGroup>
-                  {MessageTypeArray.map((type) => {
-                    const { icon: Icon } = messageTypeMeta[type];
-                    return (
-                      <SelectItem
-                        value={type}
-                        className="capitalize"
-                        key={`select-item-${type}`}
-                        onPointerDown={() => setType((curr) => (curr === type ? undefined : type))}
-                      >
-                        <Icon />
-                        <span>{type}</span>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+              <Select value={type} key={`type-select-${type}`}>
+                <SelectTrigger className="capitalize">
+                  <SelectValue placeholder={'Type'} />
+                </SelectTrigger>
+                <SelectContent align="end" position="popper">
+                  <SelectGroup>
+                    {MessageTypeArray.map((type) => {
+                      const { icon: Icon } = messageTypeMeta[type];
+                      return (
+                        <SelectItem
+                          value={type}
+                          className="capitalize"
+                          key={`select-item-${type}`}
+                          onPointerDown={() =>
+                            setType((curr) => (curr === type ? undefined : type))
+                          }
+                        >
+                          <Icon />
+                          <span>{type}</span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
 
-            <Button
-              size={'icon'}
-              variant={'outline'}
-              disabled={!Boolean(status || type)}
-              onClick={() => {
-                setSorted(false);
-                setType(undefined);
-                setStatus(undefined);
-              }}
-            >
-              <RotateCcw />
-            </Button>
-          </Widget.Footer>
-        </Widget>
+              <Button
+                size={'icon'}
+                variant={'outline'}
+                disabled={!Boolean(status || type)}
+                onClick={() => {
+                  setSorted(false);
+                  setType(undefined);
+                  setStatus(undefined);
+                }}
+              >
+                <RotateCcw />
+              </Button>
+            </Widget.Footer>
+          </Widget>
+        </div>
+
+        <div className="w-full px-2">
+          <Separator className="" />
+        </div>
       </div>
 
-      <div className="w-full px-2">
-        <Separator className="" />
+      <div
+        style={{
+          height: height ? `calc(100% - ${height}px)` : '',
+        }}
+        className="min-h-40 overflow-hidden"
+      >
+        <InboxScrollArea mounted={Boolean(height)} list={filteredList} />
       </div>
-
-      <Widget variant="compact" className="w-full">
-        <Widget.Content className="w-full">
-          <InboxScrollArea list={filteredList} />
-        </Widget.Content>
-      </Widget>
-    </section>
+    </div>
   );
 }

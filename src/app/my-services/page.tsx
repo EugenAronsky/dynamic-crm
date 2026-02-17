@@ -5,6 +5,7 @@ import { columns, Service } from './columns';
 import { DataTable } from './data-table';
 import Widget from '@/components/blocks/widgets/widget';
 import { AnyBlockConfig } from '@/components/blocks/widgets/pipeline/pipeline-body';
+import { useEffect, useRef, useState } from 'react';
 
 const data: Service[] = [
   {
@@ -224,21 +225,49 @@ const PipelineBlocks: AnyBlockConfig[] = [
 ];
 
 export default function MyServices() {
+  const [height, setHeight] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    window.addEventListener(
+      'resize',
+      () => {
+        setHeight((ref.current?.clientHeight ?? 0) - (headRef.current?.clientHeight ?? 0));
+      },
+      { signal: controller.signal }
+    );
+
+    return () => controller.abort();
+  }, []);
+
   return (
-    <section className="flex flex-1 flex-col">
-      <div className="w-full p-2">
-        <Pipeline blocks={PipelineBlocks} />
+    <div ref={ref} className="flex min-w-210 flex-1 flex-col">
+      <div ref={headRef} className="flex flex-col">
+        <div className="w-full p-2">
+          <Pipeline blocks={PipelineBlocks} />
+        </div>
+
+        <div className="w-full px-2">
+          <Separator className="" />
+        </div>
       </div>
 
-      <div className="w-full px-2">
-        <Separator className="" />
+      <div className="h-full min-h-70 overflow-hidden">
+        <Widget
+          variant="compact"
+          style={{
+            height: height ? `${height}px` : '100%',
+            minHeight: height ? `${height}px` : '100%',
+            maxHeight: height ? `${height}px` : '100%',
+          }}
+        >
+          <Widget.Content>
+            <DataTable columns={columns} data={data} />
+          </Widget.Content>
+        </Widget>
       </div>
-
-      <Widget variant="compact">
-        <Widget.Content>
-          <DataTable columns={columns} data={data} />
-        </Widget.Content>
-      </Widget>
-    </section>
+    </div>
   );
 }

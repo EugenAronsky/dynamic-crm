@@ -5,10 +5,8 @@ import { Geist, Geist_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 
 import AppBread from '@/components/blocks/nav/app-bread';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { Globe2 } from 'lucide-react';
 import LanguagePicker from '@/components/blocks/nav/language-picker';
+import { Separator } from '@/components/ui/separator';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -54,7 +52,7 @@ export default function RootLayout({
                 <LanguagePicker />
               </div>
             </div>
-            <section className="relative flex flex-1 overflow-hidden shadow-[inset_0_0_10px_0] shadow-black/10">
+            <section className="custom-scrollbar relative flex max-h-[clac(100%-48.4px)] max-w-svw flex-1 overflow-auto shadow-[inset_0_0_10px_0] shadow-black/10">
               {children}
             </section>
           </main>

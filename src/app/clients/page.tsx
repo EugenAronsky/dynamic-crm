@@ -5,13 +5,12 @@ import Pipeline from '@/components/blocks/widgets/pipeline/pipeline';
 import { AnyBlockConfig } from '@/components/blocks/widgets/pipeline/pipeline-body';
 import Widget from '@/components/blocks/widgets/widget';
 import { Button } from '@/components/ui/button';
-import { Item, ItemFooter, ItemHeader } from '@/components/ui/item';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Crown, LucideIcon, Notebook, Pin, Plus, ShieldAlert, UserPlus, Users } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ClientScrollArea from './client-scroll-area';
 import SearchInput from './search-input';
 
@@ -310,6 +309,9 @@ const PipelineBlocks: AnyBlockConfig[] = [
 export const normalize = (s: string) => s.replace(/\s+/g, '').toLowerCase();
 
 export default function Clients() {
+  const [height, setHeight] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
+
   const [search, setSearch] = useState<string>('');
   const [status, setStatus] = useState<RadioCategories>('all');
 
@@ -323,92 +325,114 @@ export default function Clients() {
     );
   }, [status, search]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    window.addEventListener(
+      'resize',
+      () => {
+        setHeight(headerRef.current?.clientHeight ?? 0);
+      },
+      { signal: controller.signal }
+    );
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    setHeight(headerRef.current?.clientHeight ?? 0);
+  }, [headerRef]);
+
   return (
-    <section className="flex flex-1 flex-col">
-      <Widget
-        variant="default"
-        className="m-2 mb-0 flex h-fit min-h-fit w-[calc(100%-16px)] flex-row flex-nowrap items-center justify-between bg-white p-2"
-      >
-        <Widget.Header className="w-fit basis-auto items-end gap-1.25 pl-1.5">
-          <Widget.Title className="gap-1">
-            <div className="flex items-center gap-2 font-semibold">
-              <Users size={16} />
-              <span>
-                <span className="capitalize">{status}</span> clients
-              </span>
-            </div>
-            <span className="-translate-y-1 text-xs">
-              (
-              <AnimatedNumberChange
-                fixed={0}
-                postfix=""
-                startValue={0}
-                value={filterdList.length}
-                Component={TypographyExtraSmall}
-              />
-              )
-            </span>
-          </Widget.Title>
-        </Widget.Header>
-        <Widget.Footer className="">
-          <div className="flex gap-2">
-            <SearchInput onChange={(value) => setSearch(value)} />
-            <Button className="cursor-pointer bg-blue-500! hover:brightness-95">
-              <span>Add new</span>
-              <Plus />
-            </Button>
-          </div>
-        </Widget.Footer>
-      </Widget>
-
-      <div className="w-full p-2">
-        <Pipeline blocks={PipelineBlocks} />
-      </div>
-
-      <Widget variant="compact" className="h-fit min-h-fit px-2">
-        <Widget.Content>
-          <RadioGroup
-            defaultValue="all"
-            className="flex gap-2 *:cursor-pointer"
-            onValueChange={(value) => setStatus(value as RadioCategories)}
-          >
-            {radio_categories.map((category) => (
-              <Label key={`radio-category-${category.value}`}>
-                <RadioGroupItem className="peer sr-only" value={category.value} />
-                <span
-                  className={cn(
-                    'flex h-6.5 items-center gap-1 rounded-full border py-1 pr-1.75 pl-3 text-xs hover:brightness-95',
-
-                    category.color === 'blue' &&
-                      'peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-100 peer-data-[state=checked]:text-blue-600',
-                    category.color === 'amber' &&
-                      'peer-data-[state=checked]:border-amber-600 peer-data-[state=checked]:bg-amber-100 peer-data-[state=checked]:text-amber-600',
-                    category.color === 'emerald' &&
-                      'peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-100 peer-data-[state=checked]:text-emerald-600',
-                    category.color === 'fuchsia' &&
-                      'peer-data-[state=checked]:border-fuchsia-600 peer-data-[state=checked]:bg-fuchsia-100 peer-data-[state=checked]:text-fuchsia-600',
-                    category.color === 'red' &&
-                      'peer-data-[state=checked]:border-red-600 peer-data-[state=checked]:bg-red-100 peer-data-[state=checked]:text-red-600'
-                  )}
-                >
-                  <span className="capitalize">{category.value}</span>
-                  <category.icon className="h-full" />
+    <div className="flex min-w-210 flex-1 flex-col">
+      <div ref={headerRef} className="flex flex-col">
+        <Widget
+          variant="default"
+          className="m-2 mb-0 flex h-fit min-h-fit w-[calc(100%-16px)] flex-row flex-nowrap items-center justify-between bg-white p-2"
+        >
+          <Widget.Header className="w-fit basis-auto items-end gap-1.25 pl-1.5">
+            <Widget.Title className="gap-1">
+              <div className="flex items-center gap-2 font-semibold">
+                <Users size={16} />
+                <span>
+                  <span className="capitalize">{status}</span> clients
                 </span>
-              </Label>
-            ))}
-          </RadioGroup>
-        </Widget.Content>
-      </Widget>
+              </div>
+              <span className="-translate-y-1 text-xs">
+                (
+                <AnimatedNumberChange
+                  fixed={0}
+                  postfix=""
+                  startValue={0}
+                  value={filterdList.length}
+                  Component={TypographyExtraSmall}
+                />
+                )
+              </span>
+            </Widget.Title>
+          </Widget.Header>
+          <Widget.Footer className="">
+            <div className="flex gap-2">
+              <SearchInput onChange={(value) => setSearch(value)} />
+              <Button className="cursor-pointer bg-blue-500! hover:brightness-95">
+                <span>Add new</span>
+                <Plus />
+              </Button>
+            </div>
+          </Widget.Footer>
+        </Widget>
 
-      <div className="w-full p-2">
-        <Separator className="" />
+        <div className="w-full p-2">
+          <Pipeline blocks={PipelineBlocks} />
+        </div>
+
+        <Widget variant="compact" className="h-fit min-h-fit px-2">
+          <Widget.Content>
+            <RadioGroup
+              defaultValue="all"
+              className="flex gap-2 *:cursor-pointer"
+              onValueChange={(value) => setStatus(value as RadioCategories)}
+            >
+              {radio_categories.map((category) => (
+                <Label key={`radio-category-${category.value}`}>
+                  <RadioGroupItem className="peer sr-only" value={category.value} />
+                  <span
+                    className={cn(
+                      'flex h-6.5 items-center gap-1 rounded-full border py-1 pr-1.75 pl-3 text-xs hover:brightness-95',
+
+                      category.color === 'blue' &&
+                        'peer-data-[state=checked]:border-blue-600 peer-data-[state=checked]:bg-blue-100 peer-data-[state=checked]:text-blue-600',
+                      category.color === 'amber' &&
+                        'peer-data-[state=checked]:border-amber-600 peer-data-[state=checked]:bg-amber-100 peer-data-[state=checked]:text-amber-600',
+                      category.color === 'emerald' &&
+                        'peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-100 peer-data-[state=checked]:text-emerald-600',
+                      category.color === 'fuchsia' &&
+                        'peer-data-[state=checked]:border-fuchsia-600 peer-data-[state=checked]:bg-fuchsia-100 peer-data-[state=checked]:text-fuchsia-600',
+                      category.color === 'red' &&
+                        'peer-data-[state=checked]:border-red-600 peer-data-[state=checked]:bg-red-100 peer-data-[state=checked]:text-red-600'
+                    )}
+                  >
+                    <span className="capitalize">{category.value}</span>
+                    <category.icon className="h-full" />
+                  </span>
+                </Label>
+              ))}
+            </RadioGroup>
+          </Widget.Content>
+        </Widget>
+
+        <div className="w-full p-2">
+          <Separator className="" />
+        </div>
       </div>
 
-      <Widget variant="compact" className="w-full">
-        <Widget.Content className="w-full">
-          <ClientScrollArea list={filterdList} />
-        </Widget.Content>
-      </Widget>
-    </section>
+      <div
+        style={{
+          height: height ? `calc(100% - ${height}px)` : '100%',
+        }}
+        className="h-full min-h-70 overflow-hidden"
+      >
+        <ClientScrollArea mounted={Boolean(height)} list={filterdList} />
+      </div>
+    </div>
   );
 }

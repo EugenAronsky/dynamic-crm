@@ -17,8 +17,8 @@ import {
 import { cn } from '@/lib/utils';
 import { getMonth, getYear } from 'date-fns';
 import { Ellipsis, Undo2 } from 'lucide-react';
-import { AnimatePresence, motion } from 'motion/react';
-import React, { ComponentProps, useContext, useEffect, useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import React, { ComponentProps, useContext, useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import MonthPicker from '../pickers/month-picker';
 import { RangeDatePicker } from '../pickers/range-date-picker';
@@ -26,6 +26,7 @@ import YearPicker from '../pickers/year-picker';
 import {
   DateStorageContext,
   Period,
+  periods,
   PeriodStorageContext,
   WidgetStorage,
   WidgetStoregeContext,
@@ -47,9 +48,9 @@ function WidgetInner({ children, variant = 'default', className, ...rest }: Widg
         {...rest}
         ref={containerRef}
         className={cn(
-          'relative h-full flex-col items-start gap-3 p-3',
+          'relative h-full min-h-0 shrink flex-col items-start gap-3 p-3 transition-all',
           variant === 'default' && 'min-h-75 shadow-[0_0_4px_0] shadow-black/15',
-          variant === 'compact' && 'min-h-0 bg-transparent p-0',
+          variant === 'compact' && 'min-h-fit bg-transparent p-0',
           isResizing && 'pointer-events-none blur-[2px] grayscale-100',
           className
         )}
@@ -205,16 +206,18 @@ Widget.PeriodSelect = function WidgetPeriodSelect({
     >
       <SelectTrigger
         size="sm"
-        className="hover:bg-accent min-w-20.75 cursor-pointer transition-all"
+        className="hover:bg-accent min-w-20.75 cursor-pointer capitalize transition-all"
       >
         <SelectValue />
       </SelectTrigger>
 
       <SelectContent position="popper" side="bottom" align="end">
         <SelectGroup>
-          <SelectItem value="month">Month</SelectItem>
-          <SelectItem value="week">Week</SelectItem>
-          <SelectItem value="day">Day</SelectItem>
+          {periods.map((item, index) => (
+            <SelectItem className="cursor-pointer capitalize" key={`${item}-${index}`} value={item}>
+              {item}
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
@@ -230,7 +233,7 @@ Widget.Title = function WidgetTitle({ children, className, ...rest }: ComponentP
   }
 
   return (
-    <span {...rest} className={cn('flex items-center gap-2', className)}>
+    <span {...rest} className={cn('flex items-center gap-1', className)}>
       {children}
     </span>
   );
@@ -255,8 +258,8 @@ Widget.Content = function WidgetContent({
     <ItemContent className={cn('flex w-full flex-1', className)} {...rest}>
       <motion.div
         key={'content'}
+        transition={{ duration: 0.3 }}
         className="flex flex-1"
-        transition={{ duration: 0.1 }}
         animate={{ opacity: isResizing && skeleton ? 0 : 1 }}
       >
         {heavy ? !isResizing && children : children}
@@ -264,9 +267,10 @@ Widget.Content = function WidgetContent({
       {skeleton && (
         <motion.div
           key={'skeleton'}
-          transition={{ duration: 0.1 }}
+          initial={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
           animate={{ opacity: isResizing ? 1 : 0 }}
-          className="pointer-events-none absolute inset-0 bottom-0 left-0 flex flex-1 items-center justify-center"
+          className="pointer-events-none absolute inset-0 bottom-0 left-0 flex flex-1 items-center justify-center blur-[2px]"
         >
           {skeleton}
         </motion.div>

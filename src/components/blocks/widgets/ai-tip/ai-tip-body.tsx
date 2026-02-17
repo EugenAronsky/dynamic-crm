@@ -144,7 +144,7 @@ function AITipBody() {
   return (
     <ScrollArea
       className={cn(
-        'relative h-[calc(var(--widget-content-height)-102px)] min-h-full w-full rounded-sm px-3 py-2 shadow-[inset_0_0_4px_0] shadow-black/10',
+        'relative h-[calc(var(--widget-content-height)-104px)] min-h-full w-full rounded-sm px-3 py-2 shadow-[inset_0_0_4px_0] shadow-black/10',
         today_tip.color
       )}
     >

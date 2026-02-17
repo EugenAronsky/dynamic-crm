@@ -4,7 +4,8 @@ import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 import { hasMarker } from './widget-helpers';
 
-export type Period = 'month' | 'week' | 'day';
+export const periods = ['year', 'month', 'week', 'day', 'all-time'] as const;
+export type Period = (typeof periods)[number];
 
 interface WidgetStorageContext {
   isResizing: boolean;
@@ -70,7 +71,7 @@ interface DateStorageContext {
   payload: unknown;
   setPayload: React.Dispatch<React.SetStateAction<unknown>>;
 
-  updateHistory: ({ key, payload }?: { key?: string; payload?: unknown }) => void;
+  updateHistory: (args?: { key?: string; payload?: unknown }) => void;
   prevHistory: () => void;
 }
 
